@@ -14,6 +14,14 @@ export default defineConfig({
       symbolId: 'icon-[dir]-[name]',
     }),
   ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        javascriptEnable: true,
+        additionalData: '@use "@/assets/styles/variable.scss" as *;',
+      },
+    },
+  },
   resolve: {
     // 别名
     alias: {

@@ -5,6 +5,7 @@ import zhCn from 'element-plus/dist/locale/zh-cn.mjs';
 import gloablComponent from '@/components/SvgIcon.vue';
 import { createApp } from 'vue';
 import './style.css';
+import '@/assets/styles/index.scss';
 import App from './App.vue';
 
 const app = createApp(App);

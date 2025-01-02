@@ -4,6 +4,7 @@
     <svg>
       <use xlink:href="#icon-manage"></use>
     </svg>
+    <div class="test">hello</div>
   </div>
 </template>
 
@@ -13,4 +14,8 @@ import testC from '@/components/testC.vue';
 console.log(import.meta.env);
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.test {
+  color: $color;
+}
+</style>
