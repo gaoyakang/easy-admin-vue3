@@ -11,5 +11,8 @@
       //路径映射，相对于baseUrl
       "@/*": ["src/*"]
     }
+  },
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off"
   }
 }
