@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
+import useUserStore from '@/store/modules/user';
+
 //创建axios实例
 const request = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_API,
@@ -7,6 +9,11 @@ const request = axios.create({
 });
 //请求拦截器
 request.interceptors.request.use((config) => {
+  const userStore = useUserStore();
+  // 请求头携带token
+  if (userStore.token) {
+    config.headers.token = userStore.token;
+  }
   return config;
 });
 //响应拦截器
@@ -20,7 +27,7 @@ request.interceptors.response.use(
     const status = error.response.status;
     switch (status) {
       case 401:
-        msg = 'token过期';
+        msg = 'token过期'; //TODO: 刷新 or 清除 token
         break;
       case 403:
         msg = '无权访问';
