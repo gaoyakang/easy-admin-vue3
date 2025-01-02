@@ -1,7 +1,11 @@
 <template>
-  <div>hello,world!</div>
+  <div>
+    <testC />
+  </div>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import testC from '@/components/testC.vue';
+</script>
 
 <style scoped lang="scss"></style>
