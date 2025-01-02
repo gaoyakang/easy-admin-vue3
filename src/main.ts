@@ -7,6 +7,7 @@ import { createApp } from 'vue';
 import './style.css';
 import '@/assets/styles/index.scss';
 import App from './App.vue';
+import router from './router';
 
 const app = createApp(App);
 
@@ -14,6 +15,9 @@ const app = createApp(App);
 app.use(ElementPlus, {
   locale: zhCn,
 });
+
+// 路由配置
+app.use(router);
 
 // svg图标
 import 'virtual:svg-icons-register';
