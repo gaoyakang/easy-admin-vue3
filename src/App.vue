@@ -1,6 +1,9 @@
 <template>
   <div>
     <testC />
+    <svg>
+      <use xlink:href="#icon-manage"></use>
+    </svg>
   </div>
 </template>
 
