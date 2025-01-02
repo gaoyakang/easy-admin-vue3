@@ -2,13 +2,13 @@ import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
 //@ts-expect-error忽略当前文件ts类型的检测否则有红色提示(打包会失败)
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs';
-import gloablComponent from '@/components/SvgIcon.vue';
 import { createApp } from 'vue';
 import './style.css';
 import '@/assets/styles/index.scss';
 import App from './App.vue';
 import router from './router';
 import pinia from './store';
+import './permission'; // 路由钩子
 
 const app = createApp(App);
 
@@ -25,6 +25,7 @@ app.use(pinia);
 
 // svg图标
 import 'virtual:svg-icons-register';
+import gloablComponent from '@/components/index';
 app.use(gloablComponent);
 
 // 挂载

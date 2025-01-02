@@ -79,7 +79,6 @@ const login = async () => {
     // 跳转到首页
     let redirect: string = $route.query.redirect as string;
     $router.push({ path: redirect || '/' });
-    $router.push('/');
     ElNotification({
       type: 'success',
       message: data.message,
