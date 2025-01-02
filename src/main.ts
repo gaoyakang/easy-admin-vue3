@@ -8,6 +8,7 @@ import './style.css';
 import '@/assets/styles/index.scss';
 import App from './App.vue';
 import router from './router';
+import pinia from './store';
 
 const app = createApp(App);
 
@@ -18,6 +19,9 @@ app.use(ElementPlus, {
 
 // 路由配置
 app.use(router);
+
+// 全局状态管理
+app.use(pinia);
 
 // svg图标
 import 'virtual:svg-icons-register';

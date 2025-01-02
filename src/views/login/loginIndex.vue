@@ -7,7 +7,7 @@
       <el-col :span="12" :xs="24">
         <!-- 登陆表单 -->
         <el-card class="login_form">
-          <h1>Easy-Admin</h1>
+          <h1>Easy Admin</h1>
           <!-- 表单字段 -->
           <el-form :model="loginForm" :rules="rules" ref="loginForms">
             <el-form-item prop="username">
@@ -52,14 +52,82 @@
 <script setup lang="ts">
 import { User, Lock } from '@element-plus/icons-vue';
 import { reactive, ref } from 'vue';
+import useUserStore from '@/store/modules/user';
+import { useRouter, useRoute } from 'vue-router';
+import { ElNotification } from 'element-plus';
+import { getTime } from '@/utils/time';
 
+// 登陆参数
 let loading = ref(false);
 let loginForms = ref();
 const loginForm = reactive({
   username: 'admin',
   password: '111111',
-  verifyCode: '1234',
 });
+
+// store和路由
+let useStore = useUserStore();
+let $router = useRouter();
+let $route = useRoute();
+
+// 登陆请求
+const login = async () => {
+  await loginForms.value.validate();
+  loading.value = true;
+  try {
+    let data = await useStore.userLogin(loginForm);
+    // 跳转到首页
+    let redirect: string = $route.query.redirect as string;
+    $router.push({ path: redirect || '/' });
+    $router.push('/');
+    ElNotification({
+      type: 'success',
+      message: data.message,
+      title: `Hi, ${getTime()}好`,
+    });
+    loading.value = false;
+  } catch (error) {
+    loading.value = false;
+    ElNotification({
+      type: 'error',
+      message:
+        (error as Error).message === 'null'
+          ? '用户名/密码错误'
+          : (error as Error).message,
+    });
+  }
+};
+// 校验规则
+const validatorUsername = (rule, value, callback) => {
+  if (value.length === 0) {
+    callback(new Error('请输入账号'));
+  } else {
+    callback();
+  }
+};
+const validatorPassword = (rule, value, callback) => {
+  if (value.length === 0) {
+    callback(new Error('请输入密码'));
+  } else if (value.length < 6 || value.length > 16) {
+    callback(new Error('密码应为6~16位的任意组合'));
+  } else {
+    callback();
+  }
+};
+const rules = {
+  username: [
+    {
+      trigger: 'change',
+      validator: validatorUsername,
+    },
+  ],
+  password: [
+    {
+      trigger: 'change',
+      validator: validatorPassword,
+    },
+  ],
+};
 </script>
 
 <style lang="scss" scoped>
