@@ -1,26 +1,23 @@
-import ElementPlus from 'element-plus';
-import 'element-plus/dist/index.css';
-//@ts-expect-error忽略当前文件ts类型的检测否则有红色提示(打包会失败)
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs';
 import { createApp } from 'vue';
-import './style.css';
-import '@/assets/styles/index.scss';
 import App from './App.vue';
-import router from './router';
-import pinia from './store';
-import './permission'; // 路由钩子
+
+import ElementPlus from 'element-plus';
+import 'element-plus/dist/index.css'; // 组件样式
+import 'element-plus/theme-chalk/dark/css-vars.css'; // 暗黑模式变量定义
+import '@/assets/styles/index.scss'; // 自定义css
 
 const app = createApp(App);
 
 // ele配置
-app.use(ElementPlus, {
-  locale: zhCn,
-});
+app.use(ElementPlus);
 
 // 路由配置
+import router from './router';
+import './permission'; // 路由钩子
 app.use(router);
 
 // 全局状态管理
+import pinia from './store';
 app.use(pinia);
 
 // svg图标

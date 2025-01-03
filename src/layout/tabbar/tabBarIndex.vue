@@ -1,14 +1,12 @@
 <template>
-  <el-header style="text-align: right; font-size: 12px">
-    <div class="toolbar">
-      <div class="toolbar_left">
-        <BreadCrumb />
-      </div>
-      <div class="toolbar_right">
-        <Setting />
-      </div>
+  <div class="toolbar">
+    <div class="toolbar_left">
+      <BreadCrumb />
     </div>
-  </el-header>
+    <div class="toolbar_right">
+      <Setting />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -32,5 +30,9 @@ import Setting from './setting/settingIndex.vue';
     display: flex;
     align-items: center;
   }
+}
+.toolbarDark {
+  color: white;
+  background-color: #00152a;
 }
 </style>

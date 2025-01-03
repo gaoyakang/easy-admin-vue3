@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
-import useUserStore from '@/store/modules/user';
+import useUserStore from '@/store/modules/login';
 
 //创建axios实例
 const request = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_API,
   timeout: 5000,
 });
+
 //请求拦截器
 request.interceptors.request.use((config) => {
   const userStore = useUserStore();
@@ -16,6 +17,7 @@ request.interceptors.request.use((config) => {
   }
   return config;
 });
+
 //响应拦截器
 request.interceptors.response.use(
   (response) => {

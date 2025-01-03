@@ -59,7 +59,7 @@ export const asyncRoute = [
     children: [
       {
         path: '/acl/user',
-        component: () => import('@/views/home/homeIndex.vue'),
+        component: () => import('@/views/acl/user/userIndex.vue'),
         name: 'User',
         meta: {
           title: '用户管理',
@@ -69,7 +69,7 @@ export const asyncRoute = [
       },
       {
         path: '/acl/role',
-        component: () => import('@/views/home/homeIndex.vue'),
+        component: () => import('@/views/acl/role/roleIndex.vue'),
         name: 'Role',
         meta: {
           title: '角色管理',
@@ -79,65 +79,12 @@ export const asyncRoute = [
       },
       {
         path: '/acl/permission',
-        component: () => import('@/views/home/homeIndex.vue'),
+        component: () => import('@/views/acl/permission/permissionIndex.vue'),
         name: 'Permission',
         meta: {
           title: '菜单管理',
           hidden: false,
           icon: 'List',
-        },
-      },
-    ],
-  },
-  {
-    path: '/product',
-    component: () => import('@/layout/layoutIndex.vue'),
-    name: 'Product',
-    meta: {
-      title: '商品管理',
-      hidden: false,
-      icon: 'Goods',
-    },
-    redirect: '/product/trademark',
-    children: [
-      {
-        path: '/product/trademark',
-        component: () => import('@/views/home/homeIndex.vue'),
-        name: 'Trademark',
-        meta: {
-          title: '品牌管理',
-          icon: 'ShoppingCart',
-          hidden: false,
-        },
-      },
-      {
-        path: '/product/attr',
-        component: () => import('@/views/home/homeIndex.vue'),
-        name: 'Attr',
-        meta: {
-          title: '属性管理',
-          icon: 'Management',
-          hidden: false,
-        },
-      },
-      {
-        path: '/product/spu',
-        component: () => import('@/views/home/homeIndex.vue'),
-        name: 'Spu',
-        meta: {
-          title: 'Spu',
-          icon: 'SetUp',
-          hidden: false,
-        },
-      },
-      {
-        path: '/product/sku',
-        component: () => import('@/views/home/homeIndex.vue'),
-        name: 'Sku',
-        meta: {
-          title: 'Sku',
-          icon: 'ScaleToOriginal',
-          hidden: false,
         },
       },
     ],

@@ -3,9 +3,4 @@
 </template>
 
 <script lang="ts" setup></script>
-
-<style scoped lang="scss">
-.test {
-  color: $color;
-}
-</style>
+<style scoped lang="scss"></style>

@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { User, Lock } from '@element-plus/icons-vue';
 import { reactive, ref } from 'vue';
-import useUserStore from '@/store/modules/user';
+import useUserStore from '@/store/modules/login';
 import { useRouter, useRoute } from 'vue-router';
 import { ElNotification } from 'element-plus';
 import { getTime } from '@/utils/time';

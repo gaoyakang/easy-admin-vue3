@@ -4,8 +4,9 @@ const useLayOutSettingStore = defineStore('SettingStore', {
   state: () => {
     return {
       isCollapse: false, // 侧边栏是否收缩
-      refsh: false, // ？
-      fold: false, //
+      fold: false, // 缩放图标
+      refsh: false, // 刷新当前页
+      dark: false, // 暗黑模式
     };
   },
 });

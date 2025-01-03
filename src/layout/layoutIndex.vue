@@ -1,5 +1,5 @@
 <template>
-  <el-container class="layout-container-wrapper" style="height: 100vh">
+  <el-container class="layout-container-wrapper test" style="height: 100vh">
     <!-- 左侧菜单栏 -->
     <el-aside
       width="200px"
@@ -24,7 +24,9 @@
     <!-- 右侧内容区 -->
     <el-container class="container">
       <!-- 右侧上标签栏 -->
-      <TabBar style="width: 100%" />
+      <el-header style="text-align: right; font-size: 12px">
+        <TabBar style="width: 100%" />
+      </el-header>
       <!-- 右侧主体 -->
       <el-main
         :style="{
@@ -57,7 +59,7 @@ import useLayOutSettingStore from '@/store/modules/setting';
 let LayOutSettingStore = useLayOutSettingStore();
 
 // 渲染用户动态菜单
-import useUserStore from '@/store/modules/user';
+import useUserStore from '@/store/modules/login';
 let userStore = useUserStore();
 </script>
 
@@ -78,11 +80,11 @@ let userStore = useUserStore();
   height: calc(100vh - 60px);
 }
 .el-aside {
-  background-color: #001529 !important;
+  background-color: #001529;
   transition: all 0.3s;
 }
 .el-header {
-  background-color: #fff !important;
+  background-color: #fff;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 3px 0px;
   z-index: 999;
 }

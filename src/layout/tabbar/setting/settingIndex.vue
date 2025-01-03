@@ -1,8 +1,12 @@
 <template>
+  <!-- 刷新按钮 -->
   <el-button circle size="small" :icon="Refresh" @click="updateRefsh" />
+  <!-- 全屏按钮 -->
   <el-button circle size="small" :icon="FullScreen" @click="fullScreen" />
-  <el-popover placement="bottom" title="主题设置" :width="200" trigger="hover">
+  <!-- 主题设置 -->
+  <el-popover placement="bottom" title="主题设置" :width="200" trigger="click">
     <el-form>
+      <!-- 选择主题颜色 -->
       <el-form-item label="主题颜色">
         <el-color-picker
           v-model="color"
@@ -10,8 +14,10 @@
           :predefine="predefineColors"
           size="small"
           @change="setColor"
+          @click.stop
         />
       </el-form-item>
+      <!-- 切换暗黑模式 -->
       <el-form-item label="暗黑模式">
         <el-switch
           v-model="dark"
@@ -27,8 +33,9 @@
       <el-button circle size="small" :icon="Setting" />
     </template>
   </el-popover>
-
+  <!-- 头像 -->
   <img :src="userStore.avatar" alt="" />
+  <!-- 退出登陆 -->
   <el-dropdown>
     <span class="el-dropdown-link" style="cursor: pointer">
       {{ userStore.username }}
@@ -54,7 +61,7 @@ import {
 } from '@element-plus/icons-vue';
 import useLayOutSettingStore from '@/store/modules/setting';
 let layoutSettingStore = useLayOutSettingStore();
-import useUserStore from '@/store/modules/user';
+import useUserStore from '@/store/modules/login';
 import { useRouter, useRoute } from 'vue-router';
 let $router = useRouter();
 let $route = useRoute();
@@ -64,6 +71,7 @@ const updateRefsh = () => {
   layoutSettingStore.refsh = !layoutSettingStore.refsh;
 };
 
+// 实现全屏
 const fullScreen = () => {
   let full = document.fullscreenElement;
   if (!full) {
@@ -73,11 +81,13 @@ const fullScreen = () => {
   }
 };
 
+// 退出登陆
 const logout = async () => {
   await userStore.userLogout();
   $router.push({ path: '/login', query: { redirect: $route.path } });
 };
 
+// 主题色选择
 const color = ref('rgba(255, 69, 0, 0.68)');
 const predefineColors = ref([
   '#ff4500',
@@ -96,11 +106,25 @@ const predefineColors = ref([
   '#c7158577',
 ]);
 
+// 切换暗黑模式
 const changeDark = () => {
-  //   let html = document.documentElement;
-  //   dark.value ? (html.className = 'dark') : (html.className = '');
+  // 实现原理：元素加dark类
+  let html = document.documentElement;
+  let toolbar = document.getElementsByClassName('toolbar')[0];
+  let elHeader = document.getElementsByClassName('el-header')[0];
+
+  if (dark.value) {
+    html.className = 'dark';
+    toolbar.classList.add('toolbarDark');
+    elHeader.style.backgroundColor = '#00152a';
+  } else {
+    html.className = '';
+    toolbar.classList.remove('toolbarDark');
+    elHeader.style.backgroundColor = 'white';
+  }
 };
 
+// 更改主题色
 const setColor = () => {
   let html = document.documentElement;
   html.style.setProperty('--el-color-primary', color.value);

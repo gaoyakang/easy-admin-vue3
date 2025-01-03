@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { reqLogin, reqUserInfo, reqLogOut } from '@/api/user';
-import type { LoginFormData, LoginResponseData } from '@/api/user/type';
+import { reqLogin, reqUserInfo, reqLogOut } from '@/api/login/index';
+import type { LoginFormData, LoginResponseData } from '@/api/login/type';
 import { SET_TOKEN, GET_TOKEN, REMOVE_TOKEN } from '@/utils/token';
 import { constantRoute, asyncRoute, anyRoute } from '@/router/routes';
 import cloneDeep from 'lodash/cloneDeep';

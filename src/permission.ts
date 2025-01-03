@@ -3,7 +3,7 @@ import setting from './setting';
 import nprogress from 'nprogress';
 import 'nprogress/nprogress.css';
 import pinia from './store';
-import useUserStore from './store/modules/user';
+import useUserStore from './store/modules/login';
 nprogress.configure({ showSpinner: false });
 const userStore = useUserStore(pinia);
 
