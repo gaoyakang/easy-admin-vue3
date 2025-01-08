@@ -2,7 +2,12 @@
   <div>
     <template v-for="item in menuList" :key="item.path">
       <!--没有子路由-->
-      <template v-if="!item.children">
+      <template
+        v-if="
+          !item.children ||
+          (Array.isArray(item.children) && item.children.length === 0)
+        "
+      >
         <el-menu-item
           :index="item.path"
           v-if="!item.meta.hidden"
@@ -17,7 +22,9 @@
         </el-menu-item>
       </template>
       <!-- 有子路由但是只有一个子路由 -->
-      <template v-if="item.children && item.children.length == 1">
+      <template
+        v-else-if="Array.isArray(item.children) && item.children.length === 1"
+      >
         <el-menu-item
           :index="item.children[0].path"
           v-if="!item.children[0].meta.hidden"
@@ -34,7 +41,7 @@
       <!-- 有子路由且个数大于一个1 -->
       <el-sub-menu
         :index="item.path"
-        v-if="item.children && item.children.length > 1"
+        v-else-if="Array.isArray(item.children) && item.children.length > 1"
       >
         <template #title>
           <el-icon>

@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import useLayOutSettingStore from '@/store/modules/setting';
+import useLayOutSettingStore from '../../store/modules/setting';
 import { watch, ref, nextTick } from 'vue';
 let layOutSettingStore = useLayOutSettingStore();
 

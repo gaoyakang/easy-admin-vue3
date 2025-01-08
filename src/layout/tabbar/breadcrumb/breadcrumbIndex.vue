@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import useLayOutSettingStore from '@/store/modules/setting';
+import useLayOutSettingStore from '../../../store/modules/setting';
 //获取layout配置相关的仓库
 let LayOutSettingStore = useLayOutSettingStore();
 //获取路由对象

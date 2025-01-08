@@ -1,14 +1,19 @@
 //统一管理项目用户相关的接口
-import request from '@/utils/request';
+import request from '../../utils/request';
 import type { loginFormData, loginResponseData } from './type';
 
 //用户相关的请求地址
-enum API {
-  LOGIN_URL = 'admin/acl/index/login',
-  USERINFO_URL = '/admin/acl/index/info',
-  LOGOUT_URL = '/admin/acl/index/logout',
-}
+// enum API {
+//   LOGIN_URL = 'admin/acl/index/login',
+//   USERINFO_URL = '/admin/acl/index/info',
+//   LOGOUT_URL = '/admin/acl/index/logout',
+// }
 
+enum API {
+  LOGIN_URL = '/auth/login',
+  USERINFO_URL = '/auth/info',
+  LOGOUT_URL = '/auth/logout',
+}
 //登录接口
 export const reqLogin = (data: loginFormData) => {
   return request.post<loginResponseData>(API.LOGIN_URL, data);

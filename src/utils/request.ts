@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
-import useUserStore from '@/store/modules/login';
+import useUserStore from '../store/modules/login';
+import { REMOVE_TOKEN } from './token';
 
 //创建axios实例
 const request = axios.create({
@@ -13,7 +14,7 @@ request.interceptors.request.use((config) => {
   const userStore = useUserStore();
   // 请求头携带token
   if (userStore.token) {
-    config.headers.token = userStore.token;
+    config.headers.authorization = 'Bearer ' + userStore.token;
   }
   return config;
 });
@@ -27,9 +28,12 @@ request.interceptors.response.use(
     //处理网络错误
     let msg = '';
     const status = error.response.status;
+
     switch (status) {
       case 401:
         msg = 'token过期'; //TODO: 刷新 or 清除 token
+        REMOVE_TOKEN();
+        window.location.reload();
         break;
       case 403:
         msg = '无权访问';

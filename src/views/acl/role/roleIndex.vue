@@ -141,15 +141,15 @@ import {
   reqAddOrUpdateRole,
   reqAllMenuList,
   reqSetPermission,
-} from '@/api/acl/role';
+} from '../../../api/acl/role';
 import type {
   RoleResponseData,
   Records,
   RoleData,
   MenuResponseData,
   MenuList,
-} from '@/api/acl/role/type';
-import useLayOutSettingStore from '@/store/modules/setting';
+} from '../../../api/acl/role/type';
+import useLayOutSettingStore from '../../../store/modules/setting';
 import { ElMessage } from 'element-plus';
 
 let pageNo = ref<number>(1);

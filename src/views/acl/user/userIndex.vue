@@ -36,6 +36,7 @@
       >
         批量删除
       </el-button>
+      <!-- 本体 -->
       <el-table
         style="margin: 10px 0"
         border
@@ -58,7 +59,7 @@
         <el-table-column
           label="用户名称"
           align="center"
-          prop="name"
+          prop="nickname"
           show-overflow-tooltip
         ></el-table-column>
         <el-table-column
@@ -130,16 +131,34 @@
               v-model="userParams.username"
             ></el-input>
           </el-form-item>
-          <el-form-item label="用户昵称" prop="name">
+          <el-form-item label="用户昵称" prop="nickname">
             <el-input
               placeholder="请您输入用户昵称"
-              v-model="userParams.name"
+              v-model="userParams.nickname"
             ></el-input>
           </el-form-item>
-          <el-form-item label="用户密码" prop="password" v-if="!userParams.id">
+          <el-form-item label="用户密码" prop="password">
             <el-input
               placeholder="请您输入用户密码"
               v-model="userParams.password"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="手机号" prop="phone">
+            <el-input
+              placeholder="请您输入手机号"
+              v-model="userParams.phone"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input
+              placeholder="请您输入邮箱"
+              v-model="userParams.email"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="头像" prop="avatar">
+            <el-input
+              placeholder="请您输入头像地址"
+              v-model="userParams.avatar"
             ></el-input>
           </el-form-item>
         </el-form>
@@ -203,16 +222,15 @@ import {
   reqSetUserRole,
   reqRemoveUser,
   reqSelectUser,
-} from '@/api/acl/user/index';
+} from '../../../api/acl/user/index';
 import type {
-  UserResponseData,
   Records,
   User,
   AllRoleResponseData,
   AllRole,
   SetRoleData,
-} from '@/api/acl/user/type';
-import useLayOutSettingStore from '@/store/modules/setting';
+} from '../../../api/acl/user/type';
+import useLayOutSettingStore from '../../../store/modules/setting';
 import { ElMessage } from 'element-plus';
 
 let pageNo = ref<number>(1); // 分页请求的起始页
@@ -232,8 +250,8 @@ let userRole = ref<AllRole>([]); // 用户角色
 // 收集的用户参数
 let userParams = reactive<User>({
   username: '',
-  name: '',
   password: '',
+  nickname: '',
 });
 
 let selectIdArr = ref<User[]>([]);
@@ -250,14 +268,11 @@ let settingStore = useLayOutSettingStore();
 
 const getHasUser = async (pager = 1) => {
   pageNo.value = pager;
-  let res: UserResponseData = await reqAllUser(
-    pageNo.value,
-    pageSize.value,
-    keyword.value,
-  );
-  if (res.code === 200) {
+  let res = await reqAllUser(pageNo.value, pageSize.value, keyword.value);
+  if (res.code === 20306) {
     total.value = res.data.total;
-    userArr.value = res.data.records;
+    userArr.value = res.data.users;
+    console.log(res.data);
   }
 };
 
@@ -272,31 +287,34 @@ const addUser = () => {
   Object.assign(userParams, {
     id: 0,
     username: '',
-    name: '',
+    nickname: '',
     password: '',
   });
   nextTick(() => {
     formRef.value.clearValidate('username');
-    formRef.value.clearValidate('name');
+    formRef.value.clearValidate('nickname');
     formRef.value.clearValidate('password');
   });
 };
 
 // 更新用户
 const updateUser = (row: User) => {
+  // 展示drawer
   drawer.value = true;
   Object.assign(userParams, row);
   nextTick(() => {
     formRef.value.clearValidate('username');
-    formRef.value.clearValidate('name');
+    formRef.value.clearValidate('nickname');
   });
 };
 
 // 按下确认
 const save = async () => {
   formRef.value.validate();
+  delete userParams.roleName;
+  delete userParams.roles;
   let res = await reqAddOrUpdateUser(userParams);
-  if (res.code === 200) {
+  if (res.code === 20300 || res.code === 20302) {
     drawer.value = false;
     ElMessage({
       type: 'success',
@@ -346,8 +364,11 @@ const validatorPassword = (rule, value, callBack) => {
 // 验证的规则
 const rules = {
   username: [{ required: true, trigger: 'blur', validator: validatorUserName }],
-  name: [{ required: true, trigger: 'blur', validator: validatorName }],
-  password: [{ required: true, trigger: 'blur', validator: validatorPassword }],
+  nickname: [{ trigger: 'blur', validator: validatorName }],
+  password: [{ trigger: 'blur', validator: validatorPassword }],
+  avatar: [{ trigger: 'blur' }],
+  phone: [{ trigger: 'blur' }],
+  email: [{ trigger: 'blur' }],
 };
 
 // 分配角色
@@ -398,7 +419,7 @@ const confirmClick = async () => {
 // 删除用户
 const deleteUser = async (userId: number) => {
   let res = await reqRemoveUser(userId);
-  if (res.code === 200) {
+  if (res.code === 20304) {
     ElMessage({ type: 'success', message: '删除成功' });
     getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1);
   }
@@ -410,11 +431,11 @@ const selectChange = (value) => {
 
 // 批量删除
 const deleteSelectUser = async () => {
-  let idList = selectIdArr.value.map((item) => {
+  let ids = selectIdArr.value.map((item) => {
     return item.id;
   });
-  let res = await reqSelectUser(idList);
-  if (res.code === 200) {
+  let res = await reqSelectUser(ids);
+  if (res.code === 20314) {
     ElMessage({ type: 'success', message: '删除成功' });
     getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1);
   }

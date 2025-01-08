@@ -1,4 +1,4 @@
-import router from '@/router';
+import router from './router';
 import setting from './setting';
 import nprogress from 'nprogress';
 import 'nprogress/nprogress.css';

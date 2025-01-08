@@ -5,7 +5,7 @@
 export const constantRoute = [
   {
     path: '/login',
-    component: () => import('@/views/login/loginIndex.vue'),
+    component: () => import('../views/login/loginIndex.vue'),
     name: 'login',
     meta: {
       title: 'login',
@@ -14,7 +14,7 @@ export const constantRoute = [
   },
   {
     path: '/',
-    component: () => import('@/layout/layoutIndex.vue'),
+    component: () => import('../layout/layoutIndex.vue'),
     name: 'layout',
     meta: {
       title: '',
@@ -25,7 +25,7 @@ export const constantRoute = [
     children: [
       {
         path: '/home',
-        component: () => import('@/views/home/homeIndex.vue'),
+        component: () => import('../views/home/homeIndex.vue'),
         meta: {
           title: '首页',
           hidden: false,
@@ -36,7 +36,7 @@ export const constantRoute = [
   },
   {
     path: '/404',
-    component: () => import('@/views/404/notFound.vue'),
+    component: () => import('../views/404/notFound.vue'),
     name: '404',
     meta: {
       title: '404',
@@ -47,19 +47,19 @@ export const constantRoute = [
 
 export const asyncRoute = [
   {
-    path: '/acl',
-    component: () => import('@/layout/layoutIndex.vue'),
+    path: '/system',
+    component: () => import('../layout/layoutIndex.vue'),
     name: 'Acl',
     meta: {
-      title: '权限管理',
+      title: '系统管理',
       hidden: false,
       icon: 'Lock',
     },
-    redirect: '/acl/user',
+    redirect: '/system/user',
     children: [
       {
-        path: '/acl/user',
-        component: () => import('@/views/acl/user/userIndex.vue'),
+        path: '/system/user',
+        component: () => import('../views/acl/user/userIndex.vue'),
         name: 'User',
         meta: {
           title: '用户管理',
@@ -68,8 +68,8 @@ export const asyncRoute = [
         },
       },
       {
-        path: '/acl/role',
-        component: () => import('@/views/acl/role/roleIndex.vue'),
+        path: '/system/role',
+        component: () => import('../views/acl/role/roleIndex.vue'),
         name: 'Role',
         meta: {
           title: '角色管理',
@@ -78,8 +78,8 @@ export const asyncRoute = [
         },
       },
       {
-        path: '/acl/permission',
-        component: () => import('@/views/acl/permission/permissionIndex.vue'),
+        path: '/system/permission',
+        component: () => import('../views/acl/permission/permissionIndex.vue'),
         name: 'Permission',
         meta: {
           title: '菜单管理',
@@ -88,6 +88,39 @@ export const asyncRoute = [
         },
       },
     ],
+  },
+  {
+    path: '/monitor',
+    component: () => import('../layout/layoutIndex.vue'),
+    name: 'Monitor',
+    meta: {
+      title: '系统监控',
+      hidden: false,
+      icon: 'Lock',
+    },
+    children: [],
+  },
+  {
+    path: '/service',
+    component: () => import('../layout/layoutIndex.vue'),
+    name: 'Service',
+    meta: {
+      title: '系统服务',
+      hidden: false,
+      icon: 'Lock',
+    },
+    children: [],
+  },
+  {
+    path: '/tool',
+    component: () => import('../layout/layoutIndex.vue'),
+    name: 'Tool',
+    meta: {
+      title: '系统工具',
+      hidden: false,
+      icon: 'Lock',
+    },
+    children: [],
   },
 ];
 

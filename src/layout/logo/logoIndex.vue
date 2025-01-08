@@ -5,7 +5,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import setting from '@/setting';
+import setting from '../../setting';
 </script>
 <style lang="scss" scoped>
 .logo {

@@ -4,7 +4,7 @@ import App from './App.vue';
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css'; // 组件样式
 import 'element-plus/theme-chalk/dark/css-vars.css'; // 暗黑模式变量定义
-import '@/assets/styles/index.scss'; // 自定义css
+import './assets/styles/index.scss'; // 自定义css
 
 const app = createApp(App);
 
@@ -22,7 +22,7 @@ app.use(pinia);
 
 // svg图标
 import 'virtual:svg-icons-register';
-import gloablComponent from '@/components/index';
+import gloablComponent from './components/index';
 app.use(gloablComponent);
 
 // 挂载

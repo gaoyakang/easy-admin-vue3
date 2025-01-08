@@ -1,15 +1,21 @@
 import { defineStore } from 'pinia';
-import { reqLogin, reqUserInfo, reqLogOut } from '@/api/login/index';
-import type { LoginFormData, LoginResponseData } from '@/api/login/type';
-import { SET_TOKEN, GET_TOKEN, REMOVE_TOKEN } from '@/utils/token';
-import { constantRoute, asyncRoute, anyRoute } from '@/router/routes';
+import { reqLogin, reqUserInfo, reqLogOut } from '../../api/login/index';
+import type { LoginFormData, LoginResponseData } from '../../api/login/type';
+import { SET_TOKEN, GET_TOKEN, REMOVE_TOKEN } from '../../utils/token';
+// import { constantRoute, asyncRoute, anyRoute } from '@/router/routes';
+import { constantRoute, asyncRoute, anyRoute } from '../../router/routes';
 import cloneDeep from 'lodash/cloneDeep';
-import router from '@/router';
+import router from '../../router';
 
+// 将用户路由和已有路由对比挑选出来
 let dynamicRoutes = [];
 function filterAsyncRoute(asyncRoute, routes) {
+  // console.log(routes);
+  // console.log(asyncRoute);
+  // routes是传来的
+  // asyncRoute是代码写死的
   return asyncRoute.filter((item) => {
-    if (routes.includes(item.name)) {
+    if (routes.includes(item.path)) {
       if (item.children && item.children.length > 0) {
         item.children = filterAsyncRoute(item.children, routes);
       }
@@ -33,30 +39,39 @@ const useUserStore = defineStore('User', {
     //用户登录方法
     async userLogin(data: LoginFormData) {
       const res: LoginResponseData = await reqLogin(data);
-      if (res.code === 200) {
-        this.token = res.data as string;
+      if (res.code === 20308) {
+        this.token = res.data.token as string;
         // 持久化
-        SET_TOKEN(res.data as string);
+        SET_TOKEN(res.data.token as string);
         return 'ok';
       } else {
-        return Promise.reject(new Error(res.data as string));
+        return Promise.reject(new Error(res.data.message as string));
       }
     },
     // 获取用户信息
     async userInfo() {
       const res: userInfoResponseData = await reqUserInfo();
-      if (res.code === 200) {
-        this.username = res.data.name as string;
+      if (res.code === 20226) {
+        this.username = res.data.username as string;
         this.avatar = res.data.avatar as string;
 
         // 动态生成路由
+        // 匹配路由
         const userAsyncRoute = filterAsyncRoute(
           cloneDeep(asyncRoute),
           res.data.routes,
         );
+        // 生成菜单列表
         this.menuRoutes = [...constantRoute, ...userAsyncRoute, anyRoute];
+        // console.log(this.menuRoutes);
+        // console.log(this.menuRoutes[0].children.length);
+        // for (let i = 0; i < this.menuRoutes.length; i++) {
+        //   console.log(this.menuRoutes[i].children.length);
+        // }
 
-        dynamicRoutes = [...userAsyncRoute, anyRoute]; // 记录动态添加的路由
+        // 合并默认路由和用户路由
+        dynamicRoutes = [...userAsyncRoute, anyRoute];
+        // 将所有路由添加到router
         dynamicRoutes.forEach((route) => {
           router.addRoute(route); // 动态添加路由
         });
@@ -68,7 +83,7 @@ const useUserStore = defineStore('User', {
     // 退出登陆
     async userLogout() {
       const res = await reqLogOut();
-      if (res.code === 200) {
+      if (res.code === 20310) {
         this.token = '';
         this.username = '';
         this.avatar = '';

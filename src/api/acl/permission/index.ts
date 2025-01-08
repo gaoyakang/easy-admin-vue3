@@ -1,4 +1,4 @@
-import request from '@/utils/request';
+import request from '../../../utils/request';
 import type { MenuParams, PermissionResponseData } from './type';
 
 enum API {

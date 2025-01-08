@@ -52,10 +52,10 @@
 <script setup lang="ts">
 import { User, Lock } from '@element-plus/icons-vue';
 import { reactive, ref } from 'vue';
-import useUserStore from '@/store/modules/login';
+import useUserStore from '../../store/modules/login';
 import { useRouter, useRoute } from 'vue-router';
 import { ElNotification } from 'element-plus';
-import { getTime } from '@/utils/time';
+import { getTime } from '../../utils/time';
 
 // 登陆参数
 let loading = ref(false);
@@ -135,7 +135,7 @@ const rules = {
   height: 100vh;
   background-size: cover;
   position: fixed;
-  background: url('@/assets/images/background.jpg') no-repeat;
+  background: url('../../assets/images/background.jpg') no-repeat;
   .login_form {
     position: relative;
     width: 70%;

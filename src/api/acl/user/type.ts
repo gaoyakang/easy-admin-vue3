@@ -1,25 +1,25 @@
 export interface ResponseData {
   code: number;
   message: string;
-  ok: boolean;
+  success: boolean;
 }
 
 export interface User {
   id?: number;
-  createTime?: string;
-  updateTime?: string;
   username?: string;
   password?: string;
-  name?: string;
-  phone?: null;
+  nickname?: string;
+  phone?: string;
+  email?: string;
   roleName?: string;
+  avatar?: string;
 }
 
 export type Records = User[];
 
 export interface UserResponseData extends ResponseData {
   data: {
-    records: Records;
+    users: Records;
     total: number;
     size: number;
     current: number;
@@ -29,10 +29,10 @@ export interface UserResponseData extends ResponseData {
 
 export interface RoleData {
   id?: number;
-  createTime?: string;
-  updateTime?: string;
+  // createTime?: string;
+  // updateTime?: string;
   roleName: string;
-  remark: null;
+  remark: string;
 }
 
 export type AllRole = RoleData[];

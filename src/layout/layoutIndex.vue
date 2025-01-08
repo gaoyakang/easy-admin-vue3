@@ -55,11 +55,11 @@ import { useRoute } from 'vue-router';
 let $route = useRoute();
 
 // 判断侧边栏是否收缩
-import useLayOutSettingStore from '@/store/modules/setting';
+import useLayOutSettingStore from '../store/modules/setting';
 let LayOutSettingStore = useLayOutSettingStore();
 
 // 渲染用户动态菜单
-import useUserStore from '@/store/modules/login';
+import useUserStore from '../store/modules/login';
 let userStore = useUserStore();
 </script>
 

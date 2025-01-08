@@ -83,13 +83,13 @@ import {
   reqAllPermission,
   reqAddOrUpdateMenu,
   reqRemoveMenu,
-} from '@/api/acl/permission/index';
+} from '../../../api/acl/permission/index';
 import type {
   PermissionResponseData,
   PermissionList,
   Permission,
   MenuParams,
-} from '@/api/acl/permission/type';
+} from '../../../api/acl/permission/type';
 import { ElMessage } from 'element-plus';
 
 let PermissionArr = ref<PermissionList>([]);
