@@ -1,8 +1,23 @@
+import type { Component } from 'vue';
+
 // 常量路由:
 // hidden表示是否在左侧显示
 // title表示在左侧显示的名称
 // icon表示在左侧显示的图标
-export const constantRoute = [
+export type RouteType = {
+  path: string;
+  redirect?: string;
+  name?: string;
+  component?: () => Promise<Component>; // 使用 Promise<Component> 作为类型
+  meta?: {
+    title?: string;
+    hidden?: boolean;
+    icon?: string;
+  };
+  children?: RouteType[]; // 子路由
+};
+
+export const constantRoute: RouteType[] = [
   {
     path: '/login',
     component: () => import('../views/login/loginIndex.vue'),
@@ -45,7 +60,7 @@ export const constantRoute = [
   },
 ];
 
-export const asyncRoute = [
+export const asyncRoute: RouteType[] = [
   {
     path: '/system',
     component: () => import('../layout/layoutIndex.vue'),
@@ -124,7 +139,7 @@ export const asyncRoute = [
   },
 ];
 
-export const anyRoute = {
+export const anyRoute: RouteType = {
   path: '/:pathMatch(.*)*',
   redirect: '/404',
   name: 'Any',

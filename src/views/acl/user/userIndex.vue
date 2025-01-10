@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/valid-attribute-name -->
 <template>
   <div>
     <!-- 搜索框 -->
@@ -39,25 +38,45 @@
       <!-- 本体 -->
       <el-table
         style="margin: 10px 0"
-        border
         :data="userArr"
         @selection-change="selectChange"
       >
         <el-table-column type="selection" align="center"></el-table-column>
         <el-table-column
-          label="#"
+          label="序号"
           align="center"
+          width="60"
           type="index"
         ></el-table-column>
-        <el-table-column label="id" align="center" prop="id"></el-table-column>
         <el-table-column
-          label="用户名字"
+          label="用户id"
+          align="center"
+          prop="id"
+        ></el-table-column>
+        <el-table-column
+          label="头像"
+          align="center"
+          prop="avatar"
+          show-overflow-tooltip
+        >
+          <template #default="{ row }">
+            <img
+              v-if="row.avatar"
+              :src="row.avatar"
+              style="width: 50px; height: 50px; object-fit: cover"
+              alt="用户头像"
+            />
+            <span v-else>无头像</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="用户名"
           align="center"
           prop="username"
           show-overflow-tooltip
         ></el-table-column>
         <el-table-column
-          label="用户名称"
+          label="昵称"
           align="center"
           prop="nickname"
           show-overflow-tooltip
@@ -65,7 +84,19 @@
         <el-table-column
           label="用户角色"
           align="center"
-          prop="roleName"
+          prop="rolename"
+          show-overflow-tooltip
+        ></el-table-column>
+        <el-table-column
+          label="手机号"
+          align="center"
+          prop="phone"
+          show-overflow-tooltip
+        ></el-table-column>
+        <el-table-column
+          label="邮箱"
+          align="center"
+          prop="email"
           show-overflow-tooltip
         ></el-table-column>
         <el-table-column
@@ -81,7 +112,7 @@
           show-overflow-tooltip
         ></el-table-column>
         <el-table-column label="操作" width="300px" align="center">
-          <template #="{ row, $index }">
+          <template v-slot:default="{ row }">
             <el-button size="small" icon="User" @click="setRole(row)">
               分配角色
             </el-button>
@@ -115,11 +146,11 @@
         layout="prev, pager, next, jumper, -> , sizes, total"
         :total="total"
         @current-change="getHasUser"
-        @size-change="handler"
+        @size-change="pageChangehandler"
       />
     </el-card>
     <!-- 新增/更新 -->
-    <el-drawer v-model="drawer">
+    <el-drawer v-model="addOrUpdateDrawer">
       <template #header>
         <h4>{{ userParams.id ? '更新用户' : '添加用户' }}</h4>
       </template>
@@ -131,16 +162,17 @@
               v-model="userParams.username"
             ></el-input>
           </el-form-item>
+          <el-form-item label="用户密码" prop="password" v-if="!userParams.id">
+            <el-input
+              placeholder="请您输入用户密码"
+              v-model="userParams.password"
+              type="password"
+            ></el-input>
+          </el-form-item>
           <el-form-item label="用户昵称" prop="nickname">
             <el-input
               placeholder="请您输入用户昵称"
               v-model="userParams.nickname"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="用户密码" prop="password">
-            <el-input
-              placeholder="请您输入用户密码"
-              v-model="userParams.password"
             ></el-input>
           </el-form-item>
           <el-form-item label="手机号" prop="phone">
@@ -171,7 +203,7 @@
       </template>
     </el-drawer>
     <!-- 分配 -->
-    <el-drawer v-model="drawer1">
+    <el-drawer v-model="assignDrawer">
       <template #header>
         <h4>分配角色</h4>
       </template>
@@ -180,14 +212,15 @@
           <el-form-item label="用户姓名">
             <el-input v-model="userParams.username" :disabled="true"></el-input>
           </el-form-item>
-          <el-form-item label="职位列表">
+          <el-form-item label="角色列表">
             <el-checkbox
+              @change="handleCheckAllChange"
               v-model="checkAll"
               :indeterminate="isIndeterminate"
-              @change="handleCheckAllChange"
             >
               全选
             </el-checkbox>
+            <!-- 显示角色的的复选框 -->
             <el-checkbox-group
               v-model="userRole"
               @change="handleCheckedUsersChange"
@@ -197,7 +230,7 @@
                 :key="index"
                 :label="role"
               >
-                {{ role.roleName }}
+                {{ role.rolename }}
               </el-checkbox>
             </el-checkbox-group>
           </el-form-item>
@@ -205,7 +238,7 @@
       </template>
       <template #footer>
         <div style="flex: auto">
-          <el-button @click="drawer1 = false">取消</el-button>
+          <el-button @click="assignDrawer = false">取消</el-button>
           <el-button type="primary" @click="confirmClick">确定</el-button>
         </div>
       </template>
@@ -224,105 +257,192 @@ import {
   reqSelectUser,
 } from '../../../api/acl/user/index';
 import type {
-  Records,
   User,
-  AllRoleResponseData,
+  GetUserRoleResponseData,
   AllRole,
   SetRoleData,
 } from '../../../api/acl/user/type';
+
 import useLayOutSettingStore from '../../../store/modules/setting';
 import { ElMessage } from 'element-plus';
 
 let pageNo = ref<number>(1); // 分页请求的起始页
-
-let pageSize = ref<number>(5); // 分页请求的长度
-
+let pageSize = ref<number>(10); // 分页请求的长度
 let total = ref<number>(0); // 总用户数
+let userArr = ref<User[]>([]); // 表格数据
+let addOrUpdateDrawer = ref<boolean>(false); // 新增或修改用户时抽屉是否显示的开关
+let assignDrawer = ref<boolean>(false); // 分配角色时抽屉是否显示的开关
+let allRole = reactive<AllRole>([]); // 所有角色
+let userRole = reactive<AllRole>([]); // 用户角色
 
-let userArr = ref<Records>([]);
+let selectIdArr = ref<User[]>([]); // 批量删除选中的id数组
+let formRef = ref(); // 表单引用
+let keyword = ref<string>(''); // 搜索关键词
+let settingStore = useLayOutSettingStore(); //用于刷新页面
+const checkAll = ref<boolean>(false); // 是否选中所有角色
+const isIndeterminate = ref<boolean>(true); // 表示 checkbox 的不确定状态，true时显示-
 
-let drawer = ref<boolean>(false);
-let drawer1 = ref<boolean>(false);
+// 获取用户所有角色
+const setRole = async (row: User) => {
+  // 每次打开抽屉时获取用户角色和所有角色
+  Object.assign(userParams, row);
+  let res: GetUserRoleResponseData = await reqAllRole(row.id as number);
 
-let allRole = ref<AllRole>([]); // 所有角色
+  if (res.code === 20240) {
+    // 清空数据后再赋值
+    userRole = [];
+    allRole = [];
+    userRole = res.data.assignRoles; // 用户角色
+    allRole = res.data.allRolesList; // 所有角色
+    // 判断是否需要将全选样式展示
+    if (userRole.length === allRole.length) {
+      checkAll.value = true;
+      isIndeterminate.value = false;
+    } else {
+      checkAll.value = false;
+      isIndeterminate.value = true;
+    }
+    assignDrawer.value = true; // 打开抽屉
+  }
+};
 
-let userRole = ref<AllRole>([]); // 用户角色
+// 全部选择角色
+const handleCheckAllChange = (val: boolean) => {
+  // 全选时将所有角色赋值到用户角色
+  // 非全选时用户角色为[]
+  if (val) {
+    userRole = allRole;
+    checkAll.value = true;
+    isIndeterminate.value = false;
+  } else {
+    userRole = [];
+    checkAll.value = false;
+    isIndeterminate.value = true;
+  }
+};
+
+// 选择某x个角色复选框时
+const handleCheckedUsersChange = (value: string[]) => {
+  // 选中的数量与所有角色数量相同时将checkAll=true
+  const checkedCount = value.length;
+  checkAll.value = checkedCount === allRole.length;
+  // 0< 选中的数量 < 所有角色数量
+  // 显示-
+  isIndeterminate.value = checkedCount > 0 && checkedCount < allRole.length;
+};
+
+// 确认设置权限
+const confirmClick = async () => {
+  // 去重
+  let data: SetRoleData = {
+    ids: Array.from(
+      new Set(
+        userRole
+          .filter((item) => item.id !== undefined)
+          .map((item) => item.id as number),
+      ),
+    ),
+  };
+
+  let res = await reqSetUserRole(userParams.id as number, data);
+  if (res.code === 20242) {
+    ElMessage({
+      type: 'success',
+      message: '分配角色成功',
+    });
+    assignDrawer.value = false;
+    getHasUser(pageNo.value);
+  }
+};
+
 // 收集的用户参数
 let userParams = reactive<User>({
   username: '',
   password: '',
   nickname: '',
+  phone: '',
+  avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+  email: 'test@qq.com',
+  rolename: '',
 });
-
-let selectIdArr = ref<User[]>([]);
 
 // 页面挂载时请求单页用户数据
 onMounted(() => {
   getHasUser();
 });
 
-let formRef = ref();
-let keyword = ref<string>('');
-
-let settingStore = useLayOutSettingStore();
-
+// 分页获取数据
 const getHasUser = async (pager = 1) => {
   pageNo.value = pager;
   let res = await reqAllUser(pageNo.value, pageSize.value, keyword.value);
   if (res.code === 20306) {
     total.value = res.data.total;
     userArr.value = res.data.users;
-    console.log(res.data);
   }
 };
 
 // 页码改变时重新获取要展示的用户数据
-const handler = () => {
+const pageChangehandler = () => {
   getHasUser();
+};
+
+// 搜索
+const search = () => {
+  getHasUser();
+  keyword.value = '';
+};
+
+// 重置搜索
+const reset = () => {
+  settingStore.refsh = !settingStore.refsh;
 };
 
 // 新增用户
 const addUser = () => {
-  drawer.value = true;
-  Object.assign(userParams, {
-    id: 0,
-    username: '',
-    nickname: '',
-    password: '',
-  });
+  formRef.value = null; // 重置表单字段
+  addOrUpdateDrawer.value = true;
   nextTick(() => {
-    formRef.value.clearValidate('username');
-    formRef.value.clearValidate('nickname');
-    formRef.value.clearValidate('password');
+    formRef.value.resetFields(); // 重置表单字段
   });
 };
 
 // 更新用户
 const updateUser = (row: User) => {
   // 展示drawer
-  drawer.value = true;
+  addOrUpdateDrawer.value = true;
   Object.assign(userParams, row);
   nextTick(() => {
+    formRef.value.clearValidate('id');
     formRef.value.clearValidate('username');
     formRef.value.clearValidate('nickname');
   });
 };
 
+// 移除空字段
+const removeEmptyFields = (obj: any) => {
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] === '' || obj[key] === null || obj[key] === undefined) {
+      delete obj[key];
+    }
+  });
+  return obj;
+};
+
 // 按下确认
 const save = async () => {
   formRef.value.validate();
-  delete userParams.roleName;
-  delete userParams.roles;
-  let res = await reqAddOrUpdateUser(userParams);
+  // 移除空字段
+  const cleanedParams = removeEmptyFields({ ...userParams });
+  let res = await reqAddOrUpdateUser(cleanedParams);
   if (res.code === 20300 || res.code === 20302) {
-    drawer.value = false;
+    addOrUpdateDrawer.value = false;
     ElMessage({
       type: 'success',
       message: userParams.id ? '更新成功' : '添加成功',
     });
-    window.location.reload();
+    getHasUser();
   } else {
-    drawer.value = false;
+    addOrUpdateDrawer.value = false;
     ElMessage({
       type: 'error',
       message: userParams.id ? '更新失败' : '添加失败',
@@ -332,88 +452,75 @@ const save = async () => {
 
 // 按下取消
 const cancel = () => {
-  drawer.value = false;
+  addOrUpdateDrawer.value = false;
 };
 
 // 验证用户名
-const validatorUserName = (rule, value, callBack) => {
-  if (value.trim().length >= 5) {
+const validatorUserName = (_rule: any, value: any, callBack: any) => {
+  if (value.trim().length >= 5 && value.trim().length <= 12) {
     callBack();
   } else {
-    callBack(new Error('用户名字至少五位'));
-  }
-};
-// 验证昵称
-const validatorName = (rule, value, callBack) => {
-  if (value.trim().length >= 5) {
-    callBack();
-  } else {
-    callBack(new Error('用户昵称至少五位'));
+    callBack(new Error('用户名字长度5-12位'));
   }
 };
 
 // 验证密码
-const validatorPassword = (rule, value, callBack) => {
+const validatorPassword = (_rule: any, value: any, callBack: any) => {
   if (value.trim().length >= 5) {
     callBack();
   } else {
-    callBack(new Error('用户密码至少六位'));
+    callBack(new Error('用户密码长度6-13位'));
   }
 };
 
+// 验证昵称
+const validatorName = (_rule: any, value: any, callBack: any) => {
+  if (value.trim().length >= 5) {
+    callBack();
+  } else {
+    callBack(new Error('用户昵称长度5-12位'));
+  }
+};
+
+// 验证手机
+const validatorPhone = (
+  _rule: any,
+  value: string,
+  callback: (error?: Error) => void,
+) => {
+  if (value && value.trim()) {
+    const phoneRegex = /^1[3-9]\d{9}$/;
+    if (!phoneRegex.test(value)) {
+      callback(new Error('请输入有效的手机号码'));
+    } else {
+      callback();
+    }
+  }
+};
+
+// 验证邮箱
+const validatorEmail = (
+  _rule: any,
+  value: string,
+  callback: (error?: Error) => void,
+) => {
+  if (value && value.trim()) {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!emailRegex.test(value)) {
+      callback(new Error('请输入有效的邮箱地址'));
+    } else {
+      callback();
+    }
+  }
+};
 // 验证的规则
 const rules = {
   username: [{ required: true, trigger: 'blur', validator: validatorUserName }],
+  password: [{ required: true, trigger: 'blur', validator: validatorPassword }],
   nickname: [{ trigger: 'blur', validator: validatorName }],
-  password: [{ trigger: 'blur', validator: validatorPassword }],
-  avatar: [{ trigger: 'blur' }],
-  phone: [{ trigger: 'blur' }],
-  email: [{ trigger: 'blur' }],
-};
-
-// 分配角色
-const setRole = async (row: User) => {
-  drawer1.value = true;
-  Object.assign(userParams, row);
-  let res: AllRoleResponseData = await reqAllRole(userParams.id as number);
-  if (res.code === 200) {
-    allRole.value = res.data.allRolesList;
-    userRole.value = res.data.assignRoles;
-    drawer1.value = true;
-  }
-};
-
-const checkAll = ref<boolean>(false);
-const isIndeterminate = ref<boolean>(true);
-
-const handleCheckAllChange = (val: boolean) => {
-  userRole.value = val ? allRole.value : [];
-  isIndeterminate.value = false;
-};
-
-const handleCheckedUsersChange = (value: string[]) => {
-  const checkedCount = value.length;
-  checkAll.value = checkedCount === allRole.value.length;
-  isIndeterminate.value =
-    checkedCount > 0 && checkedCount < allRole.value.length;
-};
-
-const confirmClick = async () => {
-  let data: SetRoleData = {
-    userId: userParams.id as number,
-    roleIdList: userRole.value.map((item) => {
-      return item.id as number;
-    }),
-  };
-  let res = await reqSetUserRole(data);
-  if (res.code === 200) {
-    ElMessage({
-      type: 'success',
-      message: '分配职务成功',
-    });
-    drawer1.value = false;
-    getHasUser(pageNo.value);
-  }
+  phone: [{ trigger: 'blur', validator: validatorPhone }],
+  email: [{ trigger: 'blur', validator: validatorEmail }],
+  // avatar: [{ required: true, trigger: 'blur' }],
 };
 
 // 删除用户
@@ -425,7 +532,8 @@ const deleteUser = async (userId: number) => {
   }
 };
 
-const selectChange = (value) => {
+// 选择table某项时触发
+const selectChange = (value: User[]) => {
   selectIdArr.value = value;
 };
 
@@ -434,24 +542,14 @@ const deleteSelectUser = async () => {
   let ids = selectIdArr.value.map((item) => {
     return item.id;
   });
-  let res = await reqSelectUser(ids);
+  let res = await reqSelectUser(ids as number[]);
   if (res.code === 20314) {
     ElMessage({ type: 'success', message: '删除成功' });
     getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1);
   }
 };
-
-// 搜索
-const search = () => {
-  getHasUser();
-  keyword.value = '';
-};
-
-// 重置
-const reset = () => {
-  settingStore.refsh = !settingStore.refsh;
-};
 </script>
+
 <style lang="scss" scoped>
 .form {
   display: flex;

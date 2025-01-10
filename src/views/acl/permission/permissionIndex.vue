@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/valid-attribute-name -->
 <template>
   <div>
     <el-table

@@ -81,7 +81,7 @@ const login = async () => {
     $router.push({ path: redirect || '/' });
     ElNotification({
       type: 'success',
-      message: data.message,
+      message: data,
       title: `Hi, ${getTime()}好`,
     });
     loading.value = false;
@@ -97,14 +97,14 @@ const login = async () => {
   }
 };
 // 校验规则
-const validatorUsername = (rule, value, callback) => {
+const validatorUsername = (rule: any, value: string, callback: any) => {
   if (value.length === 0) {
     callback(new Error('请输入账号'));
   } else {
     callback();
   }
 };
-const validatorPassword = (rule, value, callback) => {
+const validatorPassword = (rule: any, value: string, callback: any) => {
   if (value.length === 0) {
     callback(new Error('请输入密码'));
   } else if (value.length < 6 || value.length > 16) {

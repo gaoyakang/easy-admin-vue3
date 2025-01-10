@@ -4,46 +4,60 @@ export interface ResponseData {
   success: boolean;
 }
 
+// 用户类型
 export interface User {
   id?: number;
-  username?: string;
+  username: string;
+  nickname: string;
+  phone: string;
+  avatar: string;
+  email: string;
   password?: string;
-  nickname?: string;
-  phone?: string;
-  email?: string;
-  roleName?: string;
-  avatar?: string;
+  createTime?: Date;
+  updateTime?: Date;
+  rolename: string;
 }
 
-export type Records = User[];
-
-export interface UserResponseData extends ResponseData {
-  data: {
-    users: Records;
-    total: number;
-    size: number;
-    current: number;
-    pages: number;
-  };
-}
-
+// 角色类型
 export interface RoleData {
   id?: number;
-  // createTime?: string;
-  // updateTime?: string;
-  roleName: string;
-  remark: string;
+  rolename: string;
+  label: string;
 }
 
-export type AllRole = RoleData[];
-export interface AllRoleResponseData extends ResponseData {
+// 分页查询用户返回结果类型
+export interface UserQueryAllResponseData extends ResponseData {
   data: {
-    assignRoles: AllRole;
-    allRolesList: AllRole;
+    users: User[];
+    total: number;
   };
 }
 
+// 新增或修改用户返回结果类型
+export interface AddOrUpdateUserResponseData extends ResponseData {
+  data: [];
+}
+
+// 删除单个用户返回结果类型
+export interface DeleteUserResponseData extends ResponseData {
+  data: [];
+}
+
+// 获取当前用户角色返回结果类型
+export type AllRole = RoleData[];
+export interface GetUserRoleResponseData extends ResponseData {
+  data: {
+    assignRoles: AllRole; // 系统所有角色
+    allRolesList: AllRole; // 当前用户拥有的角色
+  };
+}
+
+// 分配当前用户角色返回结果类型
+export interface AssignUserRoleResponseData extends ResponseData {
+  data: [];
+}
+
+// 发送分配角色参数的类型
 export interface SetRoleData {
-  roleIdList: number[];
-  userId: number;
+  ids: number[];
 }

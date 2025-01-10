@@ -1,35 +1,70 @@
 import request from '../../../utils/request';
-import type { RoleResponseData, RoleData, MenuResponseData } from './type';
+import type {
+  RoleData,
+  GetRolePermissionResponseData,
+  RoleQueryAllResponseData,
+  AddOrUpdateRoleAllResponseData,
+  DeleteRoleResponseData,
+  RoleAssignPermissionResponseData,
+} from './type';
 
-enum API {
-  ALLROLE_URL = '/admin/acl/role/',
-  ADDROLE_URL = '/admin/acl/role/save',
-  UPDATEROLE_URL = '/admin/acl/role/update',
-  ALLPERMISSION_URL = '/admin/acl/permission/toAssign/',
-  SETPERMISSION_URL = '/admin/acl/permission/doAssign/?',
-  REMOVEROLE_URL = '/admin/acl/role/remove/',
-}
+const API = {
+  ALLROLE_URL: '/role/',
+  ADDROLE_URL: '/role/',
+  UPDATEROLE_URL: '/role/',
+  ALLPERMISSION_URL: '/role/getAssignPermission/',
+  SETPERMISSION_URL: '/role/assignPermission/',
+  REMOVEROLE_URL: '/role/',
+  DELETEALLROLE_URL: '/role',
+};
 
-export const reqAllRoleList = (page: number, limit: number, roleName: string) =>
-  request.get<RoleResponseData>(
-    API.ALLROLE_URL + `${page}/${limit}/?roleName=${roleName}`,
+// 分页获取角色列表
+export const reqAllRoleList = (
+  page: number,
+  limit: number,
+  roleName: string,
+): Promise<RoleQueryAllResponseData> => {
+  return request.get(
+    API.ALLROLE_URL + `${page}/${limit}/?rolename=${roleName}`,
   );
+};
 
-export const reqAddOrUpdateRole = (data: RoleData) => {
+// 新增或更新角色
+export const reqAddOrUpdateRole = (
+  data: RoleData,
+): Promise<AddOrUpdateRoleAllResponseData> => {
   if (data.id) {
-    return request.put(API.UPDATEROLE_URL, data);
+    return request.patch(API.UPDATEROLE_URL + data.id, data);
   } else {
     return request.post(API.ADDROLE_URL, data);
   }
 };
 
-export const reqAllMenuList = (roleId: number) =>
-  request.get<MenuResponseData>(API.ALLPERMISSION_URL + roleId);
+// 删除单个角色
+export const reqRemoveRole = (
+  roleId: number,
+): Promise<DeleteRoleResponseData> => {
+  return request.delete(API.REMOVEROLE_URL + roleId);
+};
 
-export const reqSetPermission = (roleId: number, permissionId: number[]) =>
-  request.post(
-    API.SETPERMISSION_URL + `roleId=${roleId}&permissionId=${permissionId}`,
-  );
+// 批量删除角色
+export const reqSelectRole = (
+  ids: number[],
+): Promise<DeleteRoleResponseData> => {
+  return request.delete(API.DELETEALLROLE_URL, { data: { ids: ids } });
+};
 
-export const reqRemoveRole = (roleId: number) =>
-  request.delete(API.REMOVEROLE_URL + roleId);
+// 获取角色权限
+export const reqAllPermissionList = (
+  roleId: number,
+): Promise<GetRolePermissionResponseData> => {
+  return request.get(API.ALLPERMISSION_URL + roleId);
+};
+
+// 角色分配权限
+export const reqSetPermission = (
+  roleId: number,
+  permissionId: number[],
+): Promise<RoleAssignPermissionResponseData> => {
+  return request.post(API.SETPERMISSION_URL + roleId, { ids: permissionId });
+};

@@ -1,11 +1,11 @@
-<!-- eslint-disable vue/valid-attribute-name -->
 <template>
   <div>
+    <!-- 搜索 -->
     <el-card style="height: 80px">
       <el-form :inline="true" class="form">
-        <el-form-item label="职位搜索">
+        <el-form-item label="角色搜索">
           <el-input
-            placeholder="请你输入搜索职位的关键字"
+            placeholder="请输入角色的关键字"
             v-model="keyword"
           ></el-input>
         </el-form-item>
@@ -22,22 +22,44 @@
         </el-form-item>
       </el-form>
     </el-card>
+    <!-- 表格 -->
     <el-card style="margin: 10px 0">
       <el-button type="primary" size="default" icon="Plus" @click="addRole">
-        添加职位
+        添加角色
       </el-button>
-      <el-table border style="margin: 10px 0" :data="allRole">
+      <el-button
+        type="danger"
+        size="default"
+        :disabled="selectIdArr.length ? false : true"
+        @click="deleteSelectRole"
+      >
+        批量删除
+      </el-button>
+      <el-table
+        border
+        style="margin: 10px 0"
+        :data="allRole"
+        @selection-change="selectChange"
+      >
+        <el-table-column type="selection" align="center"></el-table-column>
         <el-table-column
-          type="index"
+          label="序号"
           align="center"
-          label="#"
+          width="60"
+          type="index"
         ></el-table-column>
         <el-table-column label="ID" align="center" prop="id"></el-table-column>
         <el-table-column
-          label="职位名称"
+          label="角色名称"
           align="center"
           show-overflow-tooltip
-          prop="roleName"
+          prop="rolename"
+        ></el-table-column>
+        <el-table-column
+          label="角色标识"
+          align="center"
+          show-overflow-tooltip
+          prop="label"
         ></el-table-column>
         <el-table-column
           label="创建时间"
@@ -52,7 +74,7 @@
           prop="updateTime"
         ></el-table-column>
         <el-table-column label="操作" width="280px" align="center">
-          <template #="{ row, $index }">
+          <template #default="{ row }">
             <el-button size="small" icon="User" @click="setPermission(row)">
               分配权限
             </el-button>
@@ -65,7 +87,7 @@
               编辑
             </el-button>
             <el-popconfirm
-              :title="`你确定要删除${row.rowName}?`"
+              :title="`你确定要删除${row.rolename}?`"
               width="260px"
               @confirm="removeRole(row.id)"
             >
@@ -78,6 +100,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <!-- 分页 -->
       <el-pagination
         v-model:current-page="pageNo"
         v-model:page-size="pageSize"
@@ -89,15 +112,22 @@
         @size-change="sizeHandler"
       />
     </el-card>
+    <!-- 弹窗 -->
     <el-dialog
       v-model="dialogVisible"
-      :title="RoleParams.id ? '更新职位' : '添加职位'"
+      :title="RoleParams.id ? '更新角色' : '添加角色'"
     >
       <el-form :model="RoleParams" :rules="rules" ref="form">
-        <el-form-item label="职位名称" prop="roleName">
+        <el-form-item label="角色名称" prop="rolename">
           <el-input
-            placeholder="请你输入职位名称"
-            v-model="RoleParams.roleName"
+            placeholder="请你输入角色名称"
+            v-model="RoleParams.rolename"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="角色标识" prop="label">
+          <el-input
+            placeholder="请你输入角色标识"
+            v-model="RoleParams.label"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -108,11 +138,18 @@
         <el-button type="primary" size="default" @click="save">确定</el-button>
       </template>
     </el-dialog>
-    <el-drawer v-model="drawer">
+    <!-- 分配角色权限 -->
+    <el-drawer v-model="assignPermissiondrawer">
       <template #header>
-        <h4>分配菜单与按钮的权限</h4>
+        <h4>分配角色权限</h4>
       </template>
       <template #default>
+        <!-- data：用于展示的数据，PermissionData类型 -->
+        <!-- show-checkbox： 显示复选框 -->
+        <!-- node-key：每个树节点用来作为唯一标识的属性 -->
+        <!-- default-expand-all：默认不展开所有节点 -->
+        <!-- default-checked-keys：默认展开的节点的 key 的数组 -->
+        <!-- props：传入的配置 -->
         <el-tree
           ref="tree"
           :data="menuArr"
@@ -125,8 +162,10 @@
       </template>
       <template #footer>
         <div style="flex: auto">
-          <el-button @click="drawer = false">取消</el-button>
-          <el-button type="primary" @click="handler">确定</el-button>
+          <el-button @click="assignPermissiondrawer = false">取消</el-button>
+          <el-button type="primary" @click="assignPermissionHandler">
+            确定
+          </el-button>
         </div>
       </template>
     </el-drawer>
@@ -136,86 +175,91 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, nextTick } from 'vue';
 import {
+  reqSelectRole,
   reqRemoveRole,
   reqAllRoleList,
   reqAddOrUpdateRole,
-  reqAllMenuList,
+  reqAllPermissionList,
   reqSetPermission,
 } from '../../../api/acl/role';
 import type {
-  RoleResponseData,
+  RoleQueryAllResponseData,
+  DeleteRoleResponseData,
   Records,
   RoleData,
-  MenuResponseData,
-  MenuList,
+  GetRolePermissionResponseData,
+  PermissionData,
+  RoleAssignPermissionResponseData,
 } from '../../../api/acl/role/type';
 import useLayOutSettingStore from '../../../store/modules/setting';
 import { ElMessage } from 'element-plus';
+let pageNo = ref<number>(1); // 分页开始位置
+let pageSize = ref<number>(10); // 分页条数
+let settingStore = useLayOutSettingStore(); // 刷新页面
+let dialogVisible = ref<boolean>(false); // 是否显示弹窗
+let keyword = ref<string>(''); // 查询关键字
+let selectIdArr = ref<RoleData[]>([]); // 批量删除选中的id数组
 
-let pageNo = ref<number>(1);
+let allRole = ref<Records>([]); // 所有角色列表
+let total = ref<number>(0); // 总条数
+let form = ref(); // 表单引用
+let assignPermissiondrawer = ref<boolean>(false); //
+let menuArr = ref<PermissionData[]>([]);
+let selectArr = ref<number[]>([]); // 已选中的权限
+let tree = ref();
 
-let pageSize = ref<number>(10);
-
-let settingStore = useLayOutSettingStore();
-
-let dialogVisible = ref<boolean>(false);
-
+// 角色参数
 let RoleParams = reactive<RoleData>({
-  roleName: '',
+  rolename: '',
+  label: '',
 });
 
+// 初始化加载
 onMounted(() => {
   getHasRole();
 });
 
-let keyword = ref<string>('');
-
-let allRole = ref<Records>([]);
-
-let total = ref<number>(0);
-let form = ref();
-
-let drawer = ref<boolean>(false);
-
-let menuArr = ref<MenuList>([]);
-
-let selectArr = ref<number[]>([]);
-
-let tree = ref();
+// 分页获取角色列表
 const getHasRole = async (pager = 1) => {
   pageNo.value = pager;
-  let res: RoleResponseData = await reqAllRoleList(
+  let res: RoleQueryAllResponseData = await reqAllRoleList(
     pageNo.value,
     pageSize.value,
     keyword.value,
   );
-  if (res.code === 200) {
+  if (res.code === 20322) {
     total.value = res.data.total;
     allRole.value = res.data.records;
   }
 };
 
-const sizeHandler = () => {
-  getHasRole();
-};
-
+// 搜索角色
 const search = () => {
   getHasRole();
   keyword.value = '';
 };
 
+// 重置搜索
 const reset = () => {
   settingStore.refsh = !settingStore.refsh;
 };
 
+// 切换页码
+const sizeHandler = () => {
+  getHasRole();
+};
+
+// 弹窗新增角色
 const addRole = () => {
   dialogVisible.value = true;
   Object.assign(RoleParams, {
-    roleName: '',
+    rolename: '',
+    label: '',
     id: 0,
   });
   nextTick(() => {
-    form.value.clearValidate('roleName');
+    form.value.clearValidate('rolename');
+    form.value.clearValidate('label');
   });
 };
 
@@ -223,26 +267,52 @@ const updateRole = (row: RoleData) => {
   dialogVisible.value = true;
   Object.assign(RoleParams, row);
   nextTick(() => {
-    form.value.clearValidate('roleName');
+    form.value.clearValidate('rolename');
   });
 };
 
-const validateRoleName = (rule, value, callBack) => {
-  if (value.trim().length >= 2) {
+// 验证角色名
+const validateRolename = (_rule: any, value: any, callBack: any) => {
+  if (value.trim().length >= 2 && value.trim().length <= 12) {
     callBack();
   } else {
-    callBack(new Error('职位名称至少两位'));
+    callBack(new Error('角色名称2-12位'));
   }
 };
-
+// 验证角色标识
+const validateRolelabel = (_rule: any, value: any, callBack: any) => {
+  if (value.trim().length >= 2 && value.trim().length <= 15) {
+    callBack();
+  } else {
+    callBack(new Error('角色标识2-15位'));
+  }
+};
+// 字段验证规则
 const rules = {
-  roleName: [{ required: true, trigger: 'blur', validator: validateRoleName }],
+  rolename: [{ required: true, trigger: 'blur', validator: validateRolename }],
+  label: [{ required: true, trigger: 'blur', validator: validateRolelabel }],
 };
 
+// 移除空字段
+const removeEmptyFields = (obj: any) => {
+  Object.keys(obj).forEach((key) => {
+    if (
+      obj[key] === '' ||
+      obj[key] === null ||
+      obj[key] === undefined ||
+      obj[key].length === 0
+    ) {
+      delete obj[key];
+    }
+  });
+  return obj;
+};
+
+// 发起新增角色api
 const save = async () => {
   await form.value.validate();
-  let res = await reqAddOrUpdateRole(RoleParams);
-  if (res.code === 200) {
+  let res = await reqAddOrUpdateRole(removeEmptyFields(RoleParams));
+  if (res.code === 20318 || res.code === 20316) {
     ElMessage({
       type: 'success',
       message: RoleParams.id ? '更新成功' : '添加成功',
@@ -252,26 +322,62 @@ const save = async () => {
   }
 };
 
+// 删除角色
+const removeRole = async (id: number) => {
+  let res: DeleteRoleResponseData = await reqRemoveRole(id);
+  if (res.code === 20320) {
+    ElMessage({
+      type: 'success',
+      message: '删除成功',
+    });
+    getHasRole(allRole.value.length > 1 ? pageNo.value : pageNo.value - 1);
+  }
+};
+
+// 批量删除
+const deleteSelectRole = async () => {
+  let ids = selectIdArr.value.map((item) => {
+    return item.id;
+  });
+  let res: DeleteRoleResponseData = await reqSelectRole(ids as number[]);
+  if (res.code === 20326) {
+    ElMessage({ type: 'success', message: '删除成功' });
+    getHasRole();
+  }
+};
+// 选择table某项时触发
+const selectChange = (value: RoleData[]) => {
+  selectIdArr.value = value;
+};
+
+// 打开分配权限drawer
 const setPermission = async (row: RoleData) => {
-  drawer.value = true;
+  assignPermissiondrawer.value = true;
   Object.assign(RoleParams, row);
-  let res: MenuResponseData = await reqAllMenuList(RoleParams.id as number);
-  if (res.code === 200) {
+  let res: GetRolePermissionResponseData = await reqAllPermissionList(
+    RoleParams.id as number,
+  );
+  if (res.code === 20240) {
     menuArr.value = res.data;
+    selectArr.value = [];
     selectArr.value = filterSelectArr(menuArr.value, []);
   }
 };
 
+// tree的节点显示的字段
 const defaultProps = {
   children: 'children',
-  label: 'name',
+  label: 'permissionName',
 };
 
-const filterSelectArr = (allData, initArr) => {
-  allData.forEach((item) => {
-    if (item.select && item.level === 4) {
+// 筛选需要选中的节点
+const filterSelectArr = (allData: any, initArr: number[]) => {
+  allData.forEach((item: any) => {
+    // 避免因选中了目录而导致btn权限全被选上
+    if (item.select && item.type === 3) {
       initArr.push(item.id);
     }
+    // 字节点也要遍历到
     if (item.children && item.children.length > 0) {
       filterSelectArr(item.children, initArr);
     }
@@ -279,30 +385,23 @@ const filterSelectArr = (allData, initArr) => {
   return initArr;
 };
 
-const handler = async () => {
+// 发请求为角色分配权限
+const assignPermissionHandler = async () => {
   const roleId = RoleParams.id as number;
   let arr = tree.value.getCheckedKeys();
   let arr1 = tree.value.getHalfCheckedKeys();
   let permissionId = arr.concat(arr1);
-  let res = await reqSetPermission(roleId, permissionId);
-  if (res.code === 200) {
-    drawer.value = false;
+  let res: RoleAssignPermissionResponseData = await reqSetPermission(
+    roleId,
+    permissionId,
+  );
+  if (res.code === 20244) {
+    assignPermissiondrawer.value = false;
     ElMessage({
       type: 'success',
       message: '分配权限成功',
     });
-    window.location.reload();
-  }
-};
-
-const removeRole = async (id: number) => {
-  let res = await reqRemoveRole(id);
-  if (res.code === 200) {
-    ElMessage({
-      type: 'success',
-      message: '删除成功',
-    });
-    getHasRole(allRole.value.length > 1 ? pageNo.value : pageNo.value - 1);
+    getHasRole();
   }
 };
 </script>
