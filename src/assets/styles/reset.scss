@@ -180,3 +180,25 @@
    font-family: monospace, monospace;
    font-size: 1em;
  }
+ #app
+  > section
+  > aside
+  > div
+  > div.el-scrollbar__wrap.el-scrollbar__wrap--hidden-default
+  > div
+  > ul
+  > div:nth-child(2)
+  > li.el-sub-menu.is-active
+  > div
+  > i.el-icon.el-sub-menu__icon-arrow {
+  display: none !important;
+}
+.el-main-dark {
+  background-color: #060d1d;
+}
+.el-header-dark {
+  background-color: #060d1d;
+}
+.el-scrollbar__bar {
+  overflow-x: hidden; // 去掉横向滚动条
+}

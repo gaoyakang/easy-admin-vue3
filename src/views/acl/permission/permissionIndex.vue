@@ -225,7 +225,8 @@ const removeEmptyFields = (obj: any) => {
       obj[key] === '' ||
       obj[key] === null ||
       obj[key] === undefined ||
-      obj[key].length === 0
+      obj[key].length === 0 ||
+      key === 'children'
     ) {
       delete obj[key];
     }
@@ -259,7 +260,6 @@ const rules = {
   permissionCode: [
     { required: true, trigger: 'blur', validator: validatePermissionCode },
   ],
-  route: [{ required: true, trigger: 'blur' }],
 };
 </script>
 

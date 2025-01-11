@@ -1,55 +1,46 @@
 <template>
   <div>
     <template v-for="item in menuList" :key="item.path">
-      <!--没有子路由-->
-      <template
-        v-if="
-          !item.children ||
-          (Array.isArray(item.children) && item.children.length === 0)
-        "
+      <!-- 特殊处理：路径为 "/" 且有子菜单且子菜单只有一个项 -->
+      <el-menu-item
+        v-if="item.path === '/' && item.children && item.children.length === 1"
+        :index="item.children[0].path"
+        v-show="!item.children[0].meta.hidden"
+        @click="goRoute(item.children[0].path)"
       >
-        <el-menu-item
-          :index="item.path"
-          v-if="!item.meta.hidden"
-          @click="goRoute"
-        >
-          <el-icon>
-            <component :is="item.meta.icon"></component>
-          </el-icon>
-          <template #title>
-            <span>{{ item.meta.title }}</span>
-          </template>
-        </el-menu-item>
-      </template>
-      <!-- 有子路由但是只有一个子路由 -->
-      <template
-        v-else-if="Array.isArray(item.children) && item.children.length === 1"
-      >
-        <el-menu-item
-          :index="item.children[0].path"
-          v-if="!item.children[0].meta.hidden"
-          @click="goRoute"
-        >
-          <el-icon>
-            <component :is="item.children[0].meta.icon"></component>
-          </el-icon>
-          <template #title>
-            <span>{{ item.children[0].meta.title }}</span>
-          </template>
-        </el-menu-item>
-      </template>
-      <!-- 有子路由且个数大于一个1 -->
-      <el-sub-menu
-        :index="item.path"
-        v-else-if="Array.isArray(item.children) && item.children.length > 1"
-      >
+        <el-icon v-if="item.children[0].meta.icon">
+          <component :is="item.children[0].meta.icon"></component>
+        </el-icon>
         <template #title>
-          <el-icon>
-            <component :is="item.meta.icon"></component>
-          </el-icon>
+          <span>{{ item.children[0].meta.title }}</span>
+        </template>
+      </el-menu-item>
+
+      <!-- 没有子路由或子路由为空 -->
+      <el-menu-item
+        v-else-if="!item.children || item.children.length === 0"
+        :index="item.path"
+        :route="item"
+        v-show="!item.meta.hidden"
+        @click="goRoute(item.path)"
+      >
+        <el-icon v-if="item.meta.icon">
+          <component :is="item.meta.icon"></component>
+        </el-icon>
+        <template #title>
           <span>{{ item.meta.title }}</span>
         </template>
-        <Menu :menuList="item.children"></Menu>
+      </el-menu-item>
+
+      <!-- 有子路由 -->
+      <el-sub-menu v-else :index="item.path" v-show="!item.meta.hidden">
+        <template #title>
+          <el-icon v-if="item.meta.icon">
+            <component :is="item.meta.icon"></component>
+          </el-icon>
+          <span style="margin-left: 6px">{{ item.meta.title }}</span>
+        </template>
+        <Menu :menuList="item.children" />
       </el-sub-menu>
     </template>
   </div>
@@ -57,17 +48,20 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-//获取父组件传递过来的全部路由数组
+import { defineProps } from 'vue';
+
+// 获取路由器对象
+const $router = useRouter();
+
+// 获取父组件传递过来的全部路由数组
 defineProps(['menuList']);
 
-//获取路由器对象
-let $router = useRouter();
-//点击菜单的回调
-const goRoute = (vc) => {
-  //路由跳转
-  $router.push(vc.index);
+// 点击菜单的回调
+const goRoute = (path: string) => {
+  $router.push(path);
 };
 </script>
+
 <script lang="ts">
 export default {
   // eslint-disable-next-line vue/multi-word-component-names, vue/no-reserved-component-names
@@ -75,4 +69,6 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+/* 可以在这里添加一些样式 */
+</style>

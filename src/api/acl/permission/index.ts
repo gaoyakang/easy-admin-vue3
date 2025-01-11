@@ -23,6 +23,7 @@ export const reqAddOrUpdateMenu = (
   data: Permission,
 ): Promise<AddOrUpdatePermissionResponseData> => {
   if (data.id) {
+    console.log(data);
     return request.patch(API.UPDATE_URL + data.id, data);
   } else {
     return request.post(API.ADDMENU_URL, data);

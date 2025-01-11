@@ -1,5 +1,5 @@
 <template>
-  <el-container class="layout-container-wrapper test" style="height: 100vh">
+  <el-container class="layout-container-wrapper" style="height: 100vh">
     <!-- 左侧菜单栏 -->
     <el-aside
       width="200px"
@@ -13,6 +13,7 @@
           text-color="#959ea6"
           :collapse="LayOutSettingStore.isCollapse"
           :router="true"
+          :unique-opened="true"
         >
           <!-- 左侧上的logo -->
           <Logo />
@@ -91,6 +92,7 @@ let userStore = useUserStore();
 .isCollapse {
   width: 56px;
 }
+
 @media screen and (max-width: 768px) {
   .el-aside {
     position: fixed;

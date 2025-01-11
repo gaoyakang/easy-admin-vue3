@@ -72,7 +72,7 @@ const useUserStore = defineStore('User', {
         );
         // 生成菜单列表
         this.menuRoutes = [...constantRoute, ...userAsyncRoute, anyRoute];
-
+        console.log(this.menuRoutes);
         // 合并默认路由和用户路由
         dynamicRoutes = [...userAsyncRoute, anyRoute];
         // 将所有路由添加到router

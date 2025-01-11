@@ -111,9 +111,21 @@ export const asyncRoute: RouteType[] = [
     meta: {
       title: '系统监控',
       hidden: false,
-      icon: 'Lock',
+      icon: 'Monitor',
     },
-    children: [],
+    redirect: '/monitor/loginlog',
+    children: [
+      {
+        path: '/monitor/loginlog',
+        component: () => import('../views/monitor/loginlog/loginLog.vue'),
+        name: 'LoginLog',
+        meta: {
+          title: '登陆日志',
+          hidden: false,
+          icon: 'User',
+        },
+      },
+    ],
   },
   {
     path: '/service',
@@ -122,9 +134,21 @@ export const asyncRoute: RouteType[] = [
     meta: {
       title: '系统服务',
       hidden: false,
-      icon: 'Lock',
+      icon: 'Operation',
     },
-    children: [],
+    redirect: '/service/file',
+    children: [
+      {
+        path: '/service/file',
+        component: () => import('../views/service/file/fileManage.vue'),
+        name: 'File',
+        meta: {
+          title: '文件管理',
+          hidden: false,
+          icon: 'User',
+        },
+      },
+    ],
   },
   {
     path: '/tool',
@@ -133,9 +157,21 @@ export const asyncRoute: RouteType[] = [
     meta: {
       title: '系统工具',
       hidden: false,
-      icon: 'Lock',
+      icon: 'Tools',
     },
-    children: [],
+    redirect: '/tool/gencode',
+    children: [
+      {
+        path: '/tool/gencode',
+        component: () => import('../views/tool/gencode/geneCode.vue'),
+        name: 'GenCode',
+        meta: {
+          title: '代码生成',
+          hidden: false,
+          icon: 'User',
+        },
+      },
+    ],
   },
 ];
 

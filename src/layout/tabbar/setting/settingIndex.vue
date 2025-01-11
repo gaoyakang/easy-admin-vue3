@@ -111,16 +111,19 @@ const changeDark = () => {
   // 实现原理：元素加dark类
   let html = document.documentElement;
   let toolbar = document.getElementsByClassName('toolbar')[0];
-  let elHeader = document.getElementsByClassName('el-header')[0];
+  let elHeader = document.getElementsByClassName('el-header')[0] as HTMLElement;
+  let main = document.getElementsByClassName('el-main')[0];
 
   if (dark.value) {
     html.className = 'dark';
     toolbar.classList.add('toolbarDark');
-    elHeader.style.backgroundColor = '#00152a';
+    elHeader.style.backgroundColor = '#060d1d';
+    main.classList.add('el-main-dark');
   } else {
     html.className = '';
     toolbar.classList.remove('toolbarDark');
     elHeader.style.backgroundColor = 'white';
+    main.classList.remove('el-main-dark');
   }
 };
 
