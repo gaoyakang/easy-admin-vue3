@@ -27,14 +27,6 @@
       <el-button type="primary" size="default" icon="Plus" @click="addRole">
         添加角色
       </el-button>
-      <el-button
-        type="danger"
-        size="default"
-        :disabled="selectIdArr.length ? false : true"
-        @click="deleteSelectRole"
-      >
-        批量删除
-      </el-button>
       <el-table
         border
         style="margin: 10px 0"
@@ -175,7 +167,6 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, nextTick } from 'vue';
 import {
-  reqSelectRole,
   reqRemoveRole,
   reqAllRoleList,
   reqAddOrUpdateRole,
@@ -279,6 +270,7 @@ const validateRolename = (_rule: any, value: any, callBack: any) => {
     callBack(new Error('角色名称2-12位'));
   }
 };
+
 // 验证角色标识
 const validateRolelabel = (_rule: any, value: any, callBack: any) => {
   if (value.trim().length >= 2 && value.trim().length <= 15) {
@@ -287,6 +279,7 @@ const validateRolelabel = (_rule: any, value: any, callBack: any) => {
     callBack(new Error('角色标识2-15位'));
   }
 };
+
 // 字段验证规则
 const rules = {
   rolename: [{ required: true, trigger: 'blur', validator: validateRolename }],
@@ -334,17 +327,6 @@ const removeRole = async (id: number) => {
   }
 };
 
-// 批量删除
-const deleteSelectRole = async () => {
-  let ids = selectIdArr.value.map((item) => {
-    return item.id;
-  });
-  let res: DeleteRoleResponseData = await reqSelectRole(ids as number[]);
-  if (res.code === 20326) {
-    ElMessage({ type: 'success', message: '删除成功' });
-    getHasRole();
-  }
-};
 // 选择table某项时触发
 const selectChange = (value: RoleData[]) => {
   selectIdArr.value = value;

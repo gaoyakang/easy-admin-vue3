@@ -97,7 +97,7 @@ export const asyncRoute: RouteType[] = [
         component: () => import('../views/acl/permission/permissionIndex.vue'),
         name: 'Permission',
         meta: {
-          title: '菜单管理',
+          title: '权限管理',
           hidden: false,
           icon: 'List',
         },

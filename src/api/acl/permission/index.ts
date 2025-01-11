@@ -1,23 +1,37 @@
 import request from '../../../utils/request';
-import type { MenuParams, PermissionResponseData } from './type';
+import type {
+  AddOrUpdatePermissionResponseData,
+  GetAllPermissionResponseData,
+  Permission,
+} from './type';
 
-enum API {
-  ALLPERMISSION_URL = '/admin/acl/permission',
-  ADDMENU_URL = '/admin/acl/permission/save',
-  UPDATE_URL = '/admin/acl/permission/update',
-  DELETEMENU_URL = '/admin/acl/permission/remove/',
-}
+const API = {
+  ALLPERMISSION_URL: '/permission/1/999',
+  ADDMENU_URL: '/permission',
+  UPDATE_URL: '/permission/',
+  DELETEMENU_URL: '/permission/',
+};
 
-export const reqAllPermission = () =>
-  request.get<PermissionResponseData>(API.ALLPERMISSION_URL);
+// http://localhost:3000/api/v1/permission/1/40
+// 获取所有权限
+export const reqAllPermission = (): Promise<GetAllPermissionResponseData> => {
+  return request.get(API.ALLPERMISSION_URL);
+};
 
-export const reqAddOrUpdateMenu = (data: MenuParams) => {
+// 新增或更新权限
+export const reqAddOrUpdateMenu = (
+  data: Permission,
+): Promise<AddOrUpdatePermissionResponseData> => {
   if (data.id) {
-    return request.put(API.UPDATE_URL, data);
+    return request.patch(API.UPDATE_URL + data.id, data);
   } else {
     return request.post(API.ADDMENU_URL, data);
   }
 };
 
-export const reqRemoveMenu = (id: number) =>
-  request.delete(API.DELETEMENU_URL + id);
+// 删除权限
+export const reqRemoveMenu = (
+  id: number,
+): Promise<AddOrUpdatePermissionResponseData> => {
+  return request.delete(API.DELETEMENU_URL + id);
+};

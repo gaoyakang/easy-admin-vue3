@@ -361,8 +361,8 @@ let userParams = reactive<User>({
   password: '',
   nickname: '',
   phone: '',
-  avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-  email: 'test@qq.com',
+  avatar: '',
+  email: '',
   rolename: '',
 });
 
@@ -399,10 +399,28 @@ const reset = () => {
 
 // 新增用户
 const addUser = () => {
-  formRef.value = null; // 重置表单字段
   addOrUpdateDrawer.value = true;
+
+  //清空数据
+  Object.assign(userParams, {
+    id: 0,
+    username: '',
+    nickname: '',
+    password: '',
+    avatar: '',
+    phone: '',
+    email: '',
+    rolename: '',
+  });
+  //清除上一次的错误的提示信息
   nextTick(() => {
-    formRef.value.resetFields(); // 重置表单字段
+    formRef.value.clearValidate('username');
+    formRef.value.clearValidate('nickname');
+    formRef.value.clearValidate('password');
+    formRef.value.clearValidate('avatar');
+    formRef.value.clearValidate('phone');
+    formRef.value.clearValidate('email');
+    formRef.value.clearValidate('rolename');
   });
 };
 
@@ -410,11 +428,17 @@ const addUser = () => {
 const updateUser = (row: User) => {
   // 展示drawer
   addOrUpdateDrawer.value = true;
+  //存储收集已有的账号信息
   Object.assign(userParams, row);
+  //清除上一次的错误的提示信息
   nextTick(() => {
-    formRef.value.clearValidate('id');
     formRef.value.clearValidate('username');
     formRef.value.clearValidate('nickname');
+    formRef.value.clearValidate('password');
+    formRef.value.clearValidate('avatar');
+    formRef.value.clearValidate('phone');
+    formRef.value.clearValidate('email');
+    formRef.value.clearValidate('rolename');
   });
 };
 
@@ -445,7 +469,7 @@ const save = async () => {
     addOrUpdateDrawer.value = false;
     ElMessage({
       type: 'error',
-      message: userParams.id ? '更新失败' : '添加失败',
+      message: userParams.id ? '更新失败' : '添加失败' + res.message,
     });
   }
 };
@@ -457,7 +481,7 @@ const cancel = () => {
 
 // 验证用户名
 const validatorUserName = (_rule: any, value: any, callBack: any) => {
-  if (value.trim().length >= 5 && value.trim().length <= 12) {
+  if (value && value.trim().length >= 5 && value.trim().length <= 12) {
     callBack();
   } else {
     callBack(new Error('用户名字长度5-12位'));
@@ -466,7 +490,7 @@ const validatorUserName = (_rule: any, value: any, callBack: any) => {
 
 // 验证密码
 const validatorPassword = (_rule: any, value: any, callBack: any) => {
-  if (value.trim().length >= 5) {
+  if (value && value.trim().length >= 5) {
     callBack();
   } else {
     callBack(new Error('用户密码长度6-13位'));
@@ -475,7 +499,7 @@ const validatorPassword = (_rule: any, value: any, callBack: any) => {
 
 // 验证昵称
 const validatorName = (_rule: any, value: any, callBack: any) => {
-  if (value.trim().length >= 5) {
+  if (value && value.trim().length >= 5) {
     callBack();
   } else {
     callBack(new Error('用户昵称长度5-12位'));
