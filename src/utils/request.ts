@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
 import useUserStore from '../store/modules/login';
-import { REMOVE_TOKEN } from './token';
+import { removeItem } from './localStorage';
 
 //创建axios实例
 const request = axios.create({
@@ -32,7 +32,7 @@ request.interceptors.response.use(
     switch (status) {
       case 401:
         msg = 'token过期'; //TODO: 刷新 or 清除 token
-        REMOVE_TOKEN();
+        removeItem('TOKEN');
         window.location.reload();
         break;
       case 403:

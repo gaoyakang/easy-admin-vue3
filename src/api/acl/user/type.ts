@@ -15,7 +15,7 @@ export interface User {
   password?: string;
   createTime?: Date;
   updateTime?: Date;
-  rolename: string;
+  roleName: string;
 }
 
 // 角色类型

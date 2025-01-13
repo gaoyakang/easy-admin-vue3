@@ -31,16 +31,14 @@ import useLayOutSettingStore from '../../../store/modules/setting';
 let LayOutSettingStore = useLayOutSettingStore();
 //获取路由对象
 let $route = useRoute();
-//点击图标的方法
+// 图标切换收缩与否
 const changeIcon = () => {
-  //图标进行切换
-  LayOutSettingStore.isCollapse = !LayOutSettingStore.isCollapse;
+  LayOutSettingStore.toggleCollapse();
 };
 </script>
 <script lang="ts">
 export default {
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Breadcrumb',
+  name: 'BreadCrumb',
 };
 </script>
 

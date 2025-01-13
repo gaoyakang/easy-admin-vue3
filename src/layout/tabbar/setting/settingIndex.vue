@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import {
   Refresh,
   Setting,
@@ -60,13 +60,21 @@ import {
   ArrowDown,
 } from '@element-plus/icons-vue';
 import useLayOutSettingStore from '../../../store/modules/setting';
-let layoutSettingStore = useLayOutSettingStore();
 import useUserStore from '../../../store/modules/login';
 import { useRouter, useRoute } from 'vue-router';
+import { getItem } from '../../../utils/localStorage';
+
+let layoutSettingStore = useLayOutSettingStore();
+let userStore = useUserStore();
 let $router = useRouter();
 let $route = useRoute();
-let userStore = useUserStore();
 let dark = ref<boolean>(false);
+
+onMounted(() => {
+  dark.value = getItem('dark') === true;
+  applyDarkMode(dark.value);
+});
+
 const updateRefsh = () => {
   layoutSettingStore.refsh = !layoutSettingStore.refsh;
 };
@@ -108,13 +116,19 @@ const predefineColors = ref([
 
 // 切换暗黑模式
 const changeDark = () => {
-  // 实现原理：元素加dark类
+  layoutSettingStore.toggleDark();
+  dark.value = layoutSettingStore.dark;
+  applyDarkMode(dark.value);
+};
+
+// 应用暗黑模式
+const applyDarkMode = (isDark: boolean) => {
   let html = document.documentElement;
   let toolbar = document.getElementsByClassName('toolbar')[0];
   let elHeader = document.getElementsByClassName('el-header')[0] as HTMLElement;
   let main = document.getElementsByClassName('el-main')[0];
 
-  if (dark.value) {
+  if (isDark) {
     html.className = 'dark';
     toolbar.classList.add('toolbarDark');
     elHeader.style.backgroundColor = '#060d1d';

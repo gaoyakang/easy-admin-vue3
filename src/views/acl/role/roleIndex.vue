@@ -144,7 +144,7 @@
         <!-- props：传入的配置 -->
         <el-tree
           ref="tree"
-          :data="menuArr"
+          :data="permissionArr"
           show-checkbox
           node-key="id"
           default-expand-all
@@ -195,7 +195,7 @@ let allRole = ref<Records>([]); // 所有角色列表
 let total = ref<number>(0); // 总条数
 let form = ref(); // 表单引用
 let assignPermissiondrawer = ref<boolean>(false); //
-let menuArr = ref<PermissionData[]>([]);
+let permissionArr = ref<PermissionData[]>([]);
 let selectArr = ref<number[]>([]); // 已选中的权限
 let tree = ref();
 
@@ -340,9 +340,9 @@ const setPermission = async (row: RoleData) => {
     RoleParams.id as number,
   );
   if (res.code === 20240) {
-    menuArr.value = res.data;
+    permissionArr.value = res.data;
     selectArr.value = [];
-    selectArr.value = filterSelectArr(menuArr.value, []);
+    selectArr.value = filterSelectArr(permissionArr.value, []);
   }
 };
 
@@ -353,17 +353,40 @@ const defaultProps = {
 };
 
 // 筛选需要选中的节点
-const filterSelectArr = (allData: any, initArr: number[]) => {
-  allData.forEach((item: any) => {
+const filterSelectArr = (
+  allData: any,
+  initArr: number[],
+  currentLevel: number = 0,
+) => {
+  for (const item of allData) {
     // 避免因选中了目录而导致btn权限全被选上
     if (item.select && item.type === 3) {
       initArr.push(item.id);
     }
+
     // 字节点也要遍历到
     if (item.children && item.children.length > 0) {
-      filterSelectArr(item.children, initArr);
+      const nextLevel = currentLevel + 1;
+      if (nextLevel === 2) {
+        // 判断item.children是否还存在children
+        const hasGrandChildren = item.children.some(
+          (child: any) => child.children && child.children.length > 0,
+        );
+        if (hasGrandChildren) {
+          // 如果存在：继续递归
+          filterSelectArr(item.children, initArr, nextLevel);
+        } else {
+          // 如果不存在：将当前节点加入结果数组
+          if (item.select) {
+            initArr.push(item.id);
+          }
+        }
+      } else {
+        // 继续递归
+        filterSelectArr(item.children, initArr, nextLevel);
+      }
     }
-  });
+  }
   return initArr;
 };
 
@@ -387,6 +410,7 @@ const assignPermissionHandler = async () => {
   }
 };
 </script>
+
 <style lang="scss" scoped>
 .form {
   display: flex;

@@ -84,7 +84,7 @@
         <el-table-column
           label="用户角色"
           align="center"
-          prop="rolename"
+          prop="roleName"
           show-overflow-tooltip
         ></el-table-column>
         <el-table-column
@@ -273,7 +273,7 @@ let userArr = ref<User[]>([]); // 表格数据
 let addOrUpdateDrawer = ref<boolean>(false); // 新增或修改用户时抽屉是否显示的开关
 let assignDrawer = ref<boolean>(false); // 分配角色时抽屉是否显示的开关
 let allRole = reactive<AllRole>([]); // 所有角色
-let userRole = reactive<AllRole>([]); // 用户角色
+let userRole = ref<AllRole>([]); // 用户角色
 
 let selectIdArr = ref<User[]>([]); // 批量删除选中的id数组
 let formRef = ref(); // 表单引用
@@ -290,12 +290,12 @@ const setRole = async (row: User) => {
 
   if (res.code === 20240) {
     // 清空数据后再赋值
-    userRole = [];
+    userRole.value = [];
     allRole = [];
-    userRole = res.data.assignRoles; // 用户角色
+    userRole.value = res.data.assignRoles; // 用户角色
     allRole = res.data.allRolesList; // 所有角色
     // 判断是否需要将全选样式展示
-    if (userRole.length === allRole.length) {
+    if (userRole.value.length === allRole.length) {
       checkAll.value = true;
       isIndeterminate.value = false;
     } else {
@@ -308,26 +308,18 @@ const setRole = async (row: User) => {
 
 // 全部选择角色
 const handleCheckAllChange = (val: boolean) => {
-  // 全选时将所有角色赋值到用户角色
-  // 非全选时用户角色为[]
-  if (val) {
-    userRole = allRole;
-    checkAll.value = true;
-    isIndeterminate.value = false;
-  } else {
-    userRole = [];
-    checkAll.value = false;
-    isIndeterminate.value = true;
-  }
+  //val:true(全选)|false(没有全选)
+  userRole.value = val ? allRole : [];
+  //不确定的样式(确定样式)
+  isIndeterminate.value = false;
 };
 
 // 选择某x个角色复选框时
 const handleCheckedUsersChange = (value: string[]) => {
-  // 选中的数量与所有角色数量相同时将checkAll=true
   const checkedCount = value.length;
   checkAll.value = checkedCount === allRole.length;
-  // 0< 选中的数量 < 所有角色数量
-  // 显示-
+  // 0 < 选中的数量 < 所有角色数量
+  // 显示不确定状态
   isIndeterminate.value = checkedCount > 0 && checkedCount < allRole.length;
 };
 
@@ -337,7 +329,7 @@ const confirmClick = async () => {
   let data: SetRoleData = {
     ids: Array.from(
       new Set(
-        userRole
+        userRole.value
           .filter((item) => item.id !== undefined)
           .map((item) => item.id as number),
       ),
@@ -363,7 +355,7 @@ let userParams = reactive<User>({
   phone: '',
   avatar: '',
   email: '',
-  rolename: '',
+  roleName: '',
 });
 
 // 页面挂载时请求单页用户数据
@@ -537,6 +529,7 @@ const validatorEmail = (
     }
   }
 };
+
 // 验证的规则
 const rules = {
   username: [{ required: true, trigger: 'blur', validator: validatorUserName }],

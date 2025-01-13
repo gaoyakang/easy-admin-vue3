@@ -8,9 +8,14 @@
       :data="PermissionArr"
     >
       <el-table-column prop="permissionName" label="名称" />
-      <el-table-column prop="permissionCode" label="权限值" />
-      <el-table-column prop="type" label="类型" :formatter="formatRoute" />
-      <el-table-column prop="route" label="路由" />
+      <el-table-column prop="permissionCode" label="权限值" width="190" />
+      <el-table-column
+        prop="type"
+        label="类型"
+        :formatter="formatRoute"
+        width="80"
+      />
+      <el-table-column prop="route" label="路由" width="160" />
       <el-table-column
         prop="updateTime"
         label="修改时间"
@@ -18,19 +23,10 @@
       />
       <el-table-column label="操作" width="260px">
         <template #default="{ row }">
-          <el-button
-            size="small"
-            :disabled="row.level === 4 ? true : false"
-            @click="addPermission(row)"
-          >
-            {{ row.level === 3 ? '添加功能' : '添加权限' }}
+          <el-button size="small" @click="addPermission(row)">
+            添加权限
           </el-button>
-          <el-button
-            type="primary"
-            size="small"
-            :disabled="row.level === 1 ? true : false"
-            @click="updatePermission(row)"
-          >
+          <el-button type="primary" size="small" @click="updatePermission(row)">
             编辑
           </el-button>
           <el-popconfirm

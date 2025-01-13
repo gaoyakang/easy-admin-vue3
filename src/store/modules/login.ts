@@ -6,7 +6,6 @@ import type {
   LogoutResponseData,
   UserInfoResponseData,
 } from '../../api/login/type';
-import { SET_TOKEN, GET_TOKEN, REMOVE_TOKEN } from '../../utils/token';
 import {
   constantRoute,
   asyncRoute,
@@ -16,6 +15,7 @@ import {
 import cloneDeep from 'lodash/cloneDeep';
 import router from '../../router';
 import type { RouteRecordRaw } from 'vue-router';
+import { setItem, getItem, clearItem } from '../../utils/localStorage';
 
 // 将用户路由和已有路由对比挑选出来
 let dynamicRoutes: RouteType[] = [];
@@ -36,7 +36,7 @@ const useUserStore = defineStore('User', {
   // 存储数据
   state: () => {
     return {
-      token: GET_TOKEN(),
+      token: getItem('TOKEN'),
       menuRoutes: constantRoute,
       username: '',
       avatar: '',
@@ -50,7 +50,7 @@ const useUserStore = defineStore('User', {
       if (res.code === 20308) {
         this.token = res.data?.token as string;
         // 持久化
-        SET_TOKEN(res.data?.token as string);
+        setItem('TOKEN', res.data?.token as string);
         return res.message;
       } else {
         return Promise.reject(new Error(res.message as string));
@@ -91,7 +91,7 @@ const useUserStore = defineStore('User', {
         this.token = '';
         this.username = '';
         this.avatar = '';
-        REMOVE_TOKEN();
+        clearItem();
         dynamicRoutes.forEach((route) => {
           if (route.name) {
             router.removeRoute(route.name);
