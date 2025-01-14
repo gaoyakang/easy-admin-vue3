@@ -38,6 +38,7 @@ const useUserStore = defineStore('User', {
     return {
       token: getItem('TOKEN'),
       menuRoutes: constantRoute,
+      buttons: [] as string[], // 确保是字符串数组
       username: '',
       avatar: '',
     };
@@ -63,7 +64,7 @@ const useUserStore = defineStore('User', {
         // 将用户名和头像保存到store供tab组件使用
         this.username = res.data?.username as string;
         this.avatar = res.data?.avatar as string;
-
+        this.buttons = res.data?.buttons as string[];
         // 动态生成路由
         // 匹配路由
         const userAsyncRoute = filterAsyncRoute(
@@ -72,7 +73,6 @@ const useUserStore = defineStore('User', {
         );
         // 生成菜单列表
         this.menuRoutes = [...constantRoute, ...userAsyncRoute, anyRoute];
-        console.log(this.menuRoutes);
         // 合并默认路由和用户路由
         dynamicRoutes = [...userAsyncRoute, anyRoute];
         // 将所有路由添加到router

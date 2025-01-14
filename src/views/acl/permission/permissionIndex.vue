@@ -23,25 +23,36 @@
       />
       <el-table-column label="操作" width="260px">
         <template #default="{ row }">
-          <el-button size="small" @click="addPermission(row)">
+          <BtnAuthCheck
+            type="default"
+            size="small"
+            :click="() => addPermission(row)"
+            :permission="getPermissionsForRow(row, 'add')"
+          >
             添加权限
-          </el-button>
-          <el-button type="primary" size="small" @click="updatePermission(row)">
+          </BtnAuthCheck>
+
+          <BtnAuthCheck
+            type="primary"
+            size="small"
+            :click="() => updatePermission(row)"
+            :permission="getPermissionsForRow(row, 'update')"
+          >
             编辑
-          </el-button>
+          </BtnAuthCheck>
           <el-popconfirm
             :title="`你确定要删除${row.permissionName}?`"
             width="260px"
             @confirm="removeMenu(row.id)"
           >
             <template #reference>
-              <el-button
+              <BtnAuthCheck
                 type="danger"
                 size="small"
-                :disabled="row.level === 1 ? true : false"
+                :permission="getPermissionsForRow(row, 'delete')"
               >
                 删除
-              </el-button>
+              </BtnAuthCheck>
             </template>
           </el-popconfirm>
         </template>
@@ -112,6 +123,7 @@ import type {
   DeletePermissionResponseData,
 } from '../../../api/acl/permission/type';
 import { ElMessage } from 'element-plus';
+import BtnAuthCheck from '../../../components/auth/BtnAuthCheck.vue';
 
 let PermissionArr = ref<PermissionList>([]); // 渲染的权限tree数据
 let dialogVisible = ref<boolean>(false); // 新增或修改权限的弹窗是否显示
@@ -142,6 +154,53 @@ const typeOptions = [
   },
 ];
 
+// 权限映射表
+interface PermissionMap {
+  [type: number]: {
+    add: string[];
+    update: string[];
+    delete: string[];
+  };
+}
+
+type ActionType = 'add' | 'update' | 'delete';
+// 不同级别权限增删改时所需要的权限
+const permissionMap: PermissionMap = {
+  1: {
+    add: ['btn.Permission.add', 'btn.Permission.addDirPermission'],
+    update: ['btn.Permission.update', 'btn.Permission.updateDirPermission'],
+    delete: ['btn.Permission.deleteOne', 'btn.Permission.deleteDirPermission'],
+  },
+  2: {
+    add: ['btn.Permission.add', 'btn.Permission.addMenuPermission'],
+    update: ['btn.Permission.update', 'btn.Permission.updateMenuPermission'],
+    delete: ['btn.Permission.deleteOne', 'btn.Permission.deleteMenuPermission'],
+  },
+  3: {
+    add: [],
+    update: ['btn.Permission.update', 'btn.Permission.updateBtnPermission'],
+    delete: ['btn.Permission.deleteOne', 'btn.Permission.deleteBtnPermission'],
+  },
+};
+// 根据 row 的属性和操作类型返回相应的权限数组
+const getPermissionsForRow = (
+  row: Permission,
+  action: ActionType,
+): string[] => {
+  // 如果 type 为 3，只允许查看，不允许添加、修改和删除
+  if (row.type === 3) {
+    return action === 'update' || action === 'delete'
+      ? permissionMap[3][action]
+      : [];
+  }
+  // 如果 pid 为 0，视为目录级别权限
+  if (row.pid === 0) {
+    return permissionMap[1][action] || [];
+  }
+  // 否则根据 row.type 获取权限
+  return permissionMap[row.type][action] || ['btn.Permission.add'];
+};
+
 // 初始加载
 onMounted(() => {
   getHasPermission();
@@ -171,6 +230,7 @@ const formatRoute = (_row: any, _column: any, cellValue: any) => {
 // 打开新增权限弹窗
 const addPermission = (row: Permission) => {
   Object.assign(addOrUpdatePermissionData, {
+    id: 0,
     pid: 0,
     permissionName: '',
     permissionCode: '',

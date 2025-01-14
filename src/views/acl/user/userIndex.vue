@@ -10,31 +10,37 @@
           ></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button
-            type="primary"
-            size="default"
+          <BtnAuthCheck
+            :click="search"
+            :permission="['btn.User.queryOne']"
             :disabled="keyword.length ? false : true"
-            @click="search"
           >
             搜索
-          </el-button>
-          <el-button size="default" @click="reset">重置</el-button>
+          </BtnAuthCheck>
+          <BtnAuthCheck
+            size="default"
+            :click="reset"
+            :permission="['btn.User.resetQueryOne']"
+          >
+            重置
+          </BtnAuthCheck>
         </el-form-item>
       </el-form>
     </el-card>
     <!-- 表格 -->
     <el-card style="margin: 10px 0">
-      <el-button type="primary" size="default" @click="addUser">
+      <BtnAuthCheck :click="addUser" :permission="['btn.User.add']">
         添加用户
-      </el-button>
-      <el-button
+      </BtnAuthCheck>
+
+      <BtnAuthCheck
         type="danger"
-        size="default"
+        :click="deleteSelectUser"
+        :permission="['btn.User.batchDelete']"
         :disabled="selectIdArr.length ? false : true"
-        @click="deleteSelectUser"
       >
         批量删除
-      </el-button>
+      </BtnAuthCheck>
       <!-- 本体 -->
       <el-table
         style="margin: 10px 0"
@@ -113,26 +119,38 @@
         ></el-table-column>
         <el-table-column label="操作" width="300px" align="center">
           <template v-slot:default="{ row }">
-            <el-button size="small" icon="User" @click="setRole(row)">
+            <BtnAuthCheck
+              size="small"
+              icon="User"
+              type="default"
+              :click="() => setRole(row)"
+              :permission="['btn.User.assignRole']"
+            >
               分配角色
-            </el-button>
-            <el-button
-              type="primary"
+            </BtnAuthCheck>
+            <BtnAuthCheck
               size="small"
               icon="Edit"
-              @click="updateUser(row)"
+              :click="() => updateUser(row)"
+              :permission="['btn.User.update']"
             >
               编辑
-            </el-button>
+            </BtnAuthCheck>
+
             <el-popconfirm
               :title="`你确定删除${row.username}`"
               width="260px"
               @confirm="deleteUser(row.id)"
             >
               <template #reference>
-                <el-button type="danger" size="small" icon="Delete">
+                <BtnAuthCheck
+                  size="small"
+                  type="danger"
+                  icon="Delete"
+                  :permission="['btn.User.deleteOne']"
+                >
                   删除
-                </el-button>
+                </BtnAuthCheck>
               </template>
             </el-popconfirm>
           </template>
@@ -256,6 +274,7 @@ import {
   reqRemoveUser,
   reqSelectUser,
 } from '../../../api/acl/user/index';
+import BtnAuthCheck from '../../../components/auth/BtnAuthCheck.vue';
 import type {
   User,
   GetUserRoleResponseData,

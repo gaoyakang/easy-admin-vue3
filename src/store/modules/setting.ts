@@ -3,7 +3,6 @@ import { setItem, getItem } from '../../utils/localStorage';
 
 const useLayOutSettingStore = defineStore('SettingStore', {
   state: () => {
-    console.log(getItem('isCollapse'));
     return {
       // 侧边栏是否收缩
       isCollapse: getItem('isCollapse') === true, // 从localStorage读取

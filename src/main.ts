@@ -22,7 +22,7 @@ app.use(pinia);
 
 // svg图标
 import 'virtual:svg-icons-register';
-import gloablComponent from './components/index';
+import gloablComponent from './components/svg/index';
 app.use(gloablComponent);
 
 // 挂载

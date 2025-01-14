@@ -10,23 +10,28 @@
           ></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button
-            type="primary"
-            size="default"
-            :disabled="keyword ? false : true"
-            @click="search"
+          <BtnAuthCheck
+            :click="search"
+            :permission="['btn.Role.queryOne']"
+            :disabled="keyword.length ? false : true"
           >
             搜索
-          </el-button>
-          <el-button size="default" @click="reset">重置</el-button>
+          </BtnAuthCheck>
+          <BtnAuthCheck
+            size="default"
+            :click="reset"
+            :permission="['btn.Role.resetQueryOne']"
+          >
+            重置
+          </BtnAuthCheck>
         </el-form-item>
       </el-form>
     </el-card>
     <!-- 表格 -->
     <el-card style="margin: 10px 0">
-      <el-button type="primary" size="default" icon="Plus" @click="addRole">
+      <BtnAuthCheck :click="addRole" icon="Plus" :permission="['btn.Role.add']">
         添加角色
-      </el-button>
+      </BtnAuthCheck>
       <el-table
         border
         style="margin: 10px 0"
@@ -67,26 +72,38 @@
         ></el-table-column>
         <el-table-column label="操作" width="280px" align="center">
           <template #default="{ row }">
-            <el-button size="small" icon="User" @click="setPermission(row)">
+            <BtnAuthCheck
+              size="small"
+              icon="User"
+              type="default"
+              :click="() => setPermission(row)"
+              :permission="['btn.Role.assignPermission']"
+            >
               分配权限
-            </el-button>
-            <el-button
-              type="primary"
+            </BtnAuthCheck>
+            <BtnAuthCheck
               size="small"
               icon="Edit"
-              @click="updateRole(row)"
+              :click="() => updateRole(row)"
+              :permission="['btn.Role.update']"
             >
               编辑
-            </el-button>
+            </BtnAuthCheck>
+
             <el-popconfirm
               :title="`你确定要删除${row.rolename}?`"
               width="260px"
               @confirm="removeRole(row.id)"
             >
               <template #reference>
-                <el-button type="danger" size="small" icon="Delete">
+                <BtnAuthCheck
+                  size="small"
+                  type="danger"
+                  icon="Delete"
+                  :permission="['btn.Role.deleteOne']"
+                >
                   删除
-                </el-button>
+                </BtnAuthCheck>
               </template>
             </el-popconfirm>
           </template>
@@ -183,6 +200,7 @@ import type {
   RoleAssignPermissionResponseData,
 } from '../../../api/acl/role/type';
 import useLayOutSettingStore from '../../../store/modules/setting';
+import BtnAuthCheck from '../../../components/auth/BtnAuthCheck.vue';
 import { ElMessage } from 'element-plus';
 let pageNo = ref<number>(1); // 分页开始位置
 let pageSize = ref<number>(10); // 分页条数
