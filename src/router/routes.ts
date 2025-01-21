@@ -130,7 +130,7 @@ export const asyncRoute: RouteType[] = [
         component: () => import('../views/monitor/sourcelog/sourceLog.vue'),
         name: 'SourceLog',
         meta: {
-          title: '资源日志',
+          title: '硬件日志',
           hidden: false,
           icon: 'HelpFilled',
         },

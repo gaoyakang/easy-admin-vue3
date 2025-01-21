@@ -40,6 +40,7 @@ export enum ResultCode {
   PERMISSION_UPDATED_SUCCESS = 20035, // 权限更新成功
   PERMISSION_FINDONE_SUCCESS = 20036, // 查询单个权限成功
   PERMISSION_FINDALL_SUCCESS = 20037, // 查询权限成功
+  GET_HARDWARE_SUCCESS = 20039, // 获取硬件信息成功
 }
 
 export const ResultMessages = {
@@ -81,4 +82,5 @@ export const ResultMessages = {
   [ResultCode.PERMISSION_UPDATED_SUCCESS]: '权限更新成功',
   [ResultCode.PERMISSION_FINDONE_SUCCESS]: '查询单个权限成功',
   [ResultCode.PERMISSION_FINDALL_SUCCESS]: '查询权限成功',
+  [ResultCode.GET_HARDWARE_SUCCESS]: '获取硬件信息成功',
 };
