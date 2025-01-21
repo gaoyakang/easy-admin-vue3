@@ -122,7 +122,27 @@ export const asyncRoute: RouteType[] = [
         meta: {
           title: '登陆日志',
           hidden: false,
-          icon: 'User',
+          icon: 'Histogram',
+        },
+      },
+      {
+        path: '/monitor/sourcelog',
+        component: () => import('../views/monitor/sourcelog/sourceLog.vue'),
+        name: 'SourceLog',
+        meta: {
+          title: '资源日志',
+          hidden: false,
+          icon: 'HelpFilled',
+        },
+      },
+      {
+        path: '/monitor/operatelog',
+        component: () => import('../views/monitor/operatelog/operateLog.vue'),
+        name: 'OperateLog',
+        meta: {
+          title: '操作日志',
+          hidden: false,
+          icon: 'Operation',
         },
       },
     ],
@@ -145,7 +165,27 @@ export const asyncRoute: RouteType[] = [
         meta: {
           title: '文件管理',
           hidden: false,
-          icon: 'User',
+          icon: 'Files',
+        },
+      },
+      {
+        path: '/service/email',
+        component: () => import('../views/service/email/emailManage.vue'),
+        name: 'Email',
+        meta: {
+          title: '邮件管理',
+          hidden: false,
+          icon: 'Notification',
+        },
+      },
+      {
+        path: '/service/sms',
+        component: () => import('../views/service/sms/smsManage.vue'),
+        name: 'SMS',
+        meta: {
+          title: '短信管理',
+          hidden: false,
+          icon: 'ChatDotRound',
         },
       },
     ],
@@ -168,7 +208,7 @@ export const asyncRoute: RouteType[] = [
         meta: {
           title: '代码生成',
           hidden: false,
-          icon: 'User',
+          icon: 'Discount',
         },
       },
     ],

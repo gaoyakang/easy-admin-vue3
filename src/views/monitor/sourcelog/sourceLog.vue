@@ -1,0 +1,12 @@
+<template>
+  <div>
+    <el-card style="max-width: 480px">
+      <p>CPU</p>
+      <p v-for="o in 4" :key="o" class="text item">{{ 'List item ' + o }}</p>
+    </el-card>
+  </div>
+</template>
+
+<script lang="ts" setup></script>
+
+<style scoped lang="scss"></style>
