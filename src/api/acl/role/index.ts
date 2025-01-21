@@ -9,13 +9,13 @@ import type {
 } from './type';
 
 const API = {
-  ALLROLE_URL: '/role/',
-  ADDROLE_URL: '/role/',
-  UPDATEROLE_URL: '/role/',
+  ALLROLE_URL: '/role/all/',
+  ADDROLE_URL: '/role/add',
+  UPDATEROLE_URL: '/role/update/',
   ALLPERMISSION_URL: '/role/getAssignPermission/',
   SETPERMISSION_URL: '/role/assignPermission/',
-  REMOVEROLE_URL: '/role/',
-  DELETEALLROLE_URL: '/role',
+  REMOVEROLE_URL: '/role/delete/one/',
+  DELETEALLROLE_URL: '/role/delete/batch',
 };
 
 // 分页获取角色列表

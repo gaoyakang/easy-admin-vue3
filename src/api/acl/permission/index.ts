@@ -6,10 +6,10 @@ import type {
 } from './type';
 
 const API = {
-  ALLPERMISSION_URL: '/permission/1/999',
-  ADDMENU_URL: '/permission',
-  UPDATE_URL: '/permission/',
-  DELETEMENU_URL: '/permission/',
+  ALLPERMISSION_URL: '/permission/all/1/999',
+  ADDMENU_URL: '/permission/add',
+  UPDATE_URL: '/permission/update/',
+  DELETEMENU_URL: '/permission/delete/one/',
 };
 
 // http://localhost:3000/api/v1/permission/1/40

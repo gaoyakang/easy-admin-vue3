@@ -202,6 +202,8 @@ import type {
 import useLayOutSettingStore from '../../../store/modules/setting';
 import BtnAuthCheck from '../../../components/auth/BtnAuthCheck.vue';
 import { ElMessage } from 'element-plus';
+import { ResultCode } from '../../../api/constant';
+
 let pageNo = ref<number>(1); // 分页开始位置
 let pageSize = ref<number>(10); // 分页条数
 let settingStore = useLayOutSettingStore(); // 刷新页面
@@ -236,9 +238,18 @@ const getHasRole = async (pager = 1) => {
     pageSize.value,
     keyword.value,
   );
-  if (res.code === 20322) {
+  if (res.code === ResultCode.ROLE_FINDALL_SUCCESS) {
     total.value = res.data.total;
     allRole.value = res.data.records;
+    ElMessage({
+      type: 'success',
+      message: res.message,
+    });
+  } else {
+    ElMessage({
+      type: 'error',
+      message: res.message,
+    });
   }
 };
 
@@ -323,7 +334,10 @@ const removeEmptyFields = (obj: any) => {
 const save = async () => {
   await form.value.validate();
   let res = await reqAddOrUpdateRole(removeEmptyFields(RoleParams));
-  if (res.code === 20318 || res.code === 20316) {
+  if (
+    res.code === ResultCode.ROLE_CREATED_SUCCESS ||
+    res.code === ResultCode.ROLE_UPDATED_SUCCESS
+  ) {
     ElMessage({
       type: 'success',
       message: RoleParams.id ? '更新成功' : '添加成功',
@@ -336,12 +350,17 @@ const save = async () => {
 // 删除角色
 const removeRole = async (id: number) => {
   let res: DeleteRoleResponseData = await reqRemoveRole(id);
-  if (res.code === 20320) {
+  if (res.code === ResultCode.ROLE_DELETED_SUCCESS) {
     ElMessage({
       type: 'success',
-      message: '删除成功',
+      message: res.message,
     });
     getHasRole(allRole.value.length > 1 ? pageNo.value : pageNo.value - 1);
+  } else {
+    ElMessage({
+      type: 'error',
+      message: res.message,
+    });
   }
 };
 
@@ -357,7 +376,7 @@ const setPermission = async (row: RoleData) => {
   let res: GetRolePermissionResponseData = await reqAllPermissionList(
     RoleParams.id as number,
   );
-  if (res.code === 20240) {
+  if (res.code === ResultCode.USER_GET_ASSIGN_ROLE_SUCCESS) {
     permissionArr.value = res.data;
     selectArr.value = [];
     selectArr.value = filterSelectArr(permissionArr.value, []);
@@ -418,7 +437,7 @@ const assignPermissionHandler = async () => {
     roleId,
     permissionId,
   );
-  if (res.code === 20244) {
+  if (res.code === ResultCode.ROLE_ASSIGN_PERMISSION_SUCCESS) {
     assignPermissiondrawer.value = false;
     ElMessage({
       type: 'success',

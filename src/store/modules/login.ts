@@ -16,6 +16,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import router from '../../router';
 import type { RouteRecordRaw } from 'vue-router';
 import { setItem, getItem, clearItem } from '../../utils/localStorage';
+import { ResultCode } from '../../api/constant';
 
 // 将用户路由和已有路由对比挑选出来
 let dynamicRoutes: RouteType[] = [];
@@ -48,7 +49,7 @@ const useUserStore = defineStore('User', {
     //用户登录方法✅
     async userLogin(data: LoginFormData) {
       const res: LoginResponseData = await reqLogin(data);
-      if (res.code === 20308) {
+      if (res.code === ResultCode.USER_LOGIN_SUCCESS) {
         this.token = res.data?.token as string;
         // 持久化
         setItem('TOKEN', res.data?.token as string);
@@ -60,7 +61,7 @@ const useUserStore = defineStore('User', {
     // 获取用户信息
     async userInfo() {
       const res: UserInfoResponseData = await reqUserInfo();
-      if (res.code === 20226) {
+      if (res.code === ResultCode.USER_INFO_SUCCESS) {
         // 将用户名和头像保存到store供tab组件使用
         this.username = res.data?.username as string;
         this.avatar = res.data?.avatar as string;
@@ -87,7 +88,7 @@ const useUserStore = defineStore('User', {
     // 退出登陆
     async userLogout() {
       const res: LogoutResponseData = await reqLogOut();
-      if (res.code === 20310) {
+      if (res.code === ResultCode.USER_LOGOUT_SUCCESS) {
         this.token = '';
         this.username = '';
         this.avatar = '';

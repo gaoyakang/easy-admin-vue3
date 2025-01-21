@@ -284,6 +284,7 @@ import type {
 
 import useLayOutSettingStore from '../../../store/modules/setting';
 import { ElMessage } from 'element-plus';
+import { ResultCode } from '../../../api/constant';
 
 let pageNo = ref<number>(1); // 分页请求的起始页
 let pageSize = ref<number>(10); // 分页请求的长度
@@ -307,7 +308,7 @@ const setRole = async (row: User) => {
   Object.assign(userParams, row);
   let res: GetUserRoleResponseData = await reqAllRole(row.id as number);
 
-  if (res.code === 20240) {
+  if (res.code === ResultCode.USER_GET_ASSIGN_ROLE_SUCCESS) {
     // 清空数据后再赋值
     userRole.value = [];
     allRole = [];
@@ -356,7 +357,7 @@ const confirmClick = async () => {
   };
 
   let res = await reqSetUserRole(userParams.id as number, data);
-  if (res.code === 20242) {
+  if (res.code === ResultCode.USER_ASSIGN_ROLE_SUCCESS) {
     ElMessage({
       type: 'success',
       message: '分配角色成功',
@@ -386,9 +387,18 @@ onMounted(() => {
 const getHasUser = async (pager = 1) => {
   pageNo.value = pager;
   let res = await reqAllUser(pageNo.value, pageSize.value, keyword.value);
-  if (res.code === 20306) {
+  if (res.code === ResultCode.USER_FINDALL_SUCCESS) {
+    ElMessage({
+      type: 'success',
+      message: res.message,
+    });
     total.value = res.data.total;
     userArr.value = res.data.users;
+  } else {
+    ElMessage({
+      type: 'error',
+      message: res.message,
+    });
   }
 };
 
@@ -469,18 +479,21 @@ const save = async () => {
   // 移除空字段
   const cleanedParams = removeEmptyFields({ ...userParams });
   let res = await reqAddOrUpdateUser(cleanedParams);
-  if (res.code === 20300 || res.code === 20302) {
+  if (
+    res.code === ResultCode.USER_CREATED_SUCCESS ||
+    res.code === ResultCode.USER_UPDATED_SUCCESS
+  ) {
     addOrUpdateDrawer.value = false;
     ElMessage({
       type: 'success',
-      message: userParams.id ? '更新成功' : '添加成功',
+      message: res.message,
     });
     getHasUser();
   } else {
     addOrUpdateDrawer.value = false;
     ElMessage({
       type: 'error',
-      message: userParams.id ? '更新失败' : '添加失败' + res.message,
+      message: res.message,
     });
   }
 };
@@ -562,7 +575,7 @@ const rules = {
 // 删除用户
 const deleteUser = async (userId: number) => {
   let res = await reqRemoveUser(userId);
-  if (res.code === 20304) {
+  if (res.code === ResultCode.USER_DELETED_SUCCESS) {
     ElMessage({ type: 'success', message: '删除成功' });
     getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1);
   }
@@ -579,7 +592,7 @@ const deleteSelectUser = async () => {
     return item.id;
   });
   let res = await reqSelectUser(ids as number[]);
-  if (res.code === 20314) {
+  if (res.code === ResultCode.USER_BATCH_DELETE_SUCCESS) {
     ElMessage({ type: 'success', message: '删除成功' });
     getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1);
   }

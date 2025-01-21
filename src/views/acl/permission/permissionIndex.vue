@@ -124,6 +124,7 @@ import type {
 } from '../../../api/acl/permission/type';
 import { ElMessage } from 'element-plus';
 import BtnAuthCheck from '../../../components/auth/BtnAuthCheck.vue';
+import { ResultCode } from '../../../api/constant';
 
 let PermissionArr = ref<PermissionList>([]); // 渲染的权限tree数据
 let dialogVisible = ref<boolean>(false); // 新增或修改权限的弹窗是否显示
@@ -209,7 +210,7 @@ onMounted(() => {
 // 获取所有权限
 const getHasPermission = async () => {
   let res: GetAllPermissionResponseData = await reqAllPermission();
-  if (res.code === 20334) {
+  if (res.code === ResultCode.PERMISSION_FINDALL_SUCCESS) {
     PermissionArr.value = res.data.permissions;
   }
 };
@@ -255,22 +256,32 @@ const save = async () => {
   let res: AddOrUpdatePermissionResponseData = await reqAddOrUpdateMenu(
     removeEmptyFields(addOrUpdatePermissionData),
   );
-  if (res.code === 20328 || res.code === 20330) {
+  if (
+    res.code === ResultCode.PERMISSION_UPDATED_SUCCESS ||
+    res.code === ResultCode.PERMISSION_CREATED_SUCCESS
+  ) {
     dialogVisible.value = false;
     ElMessage({
       type: 'success',
-      message: addOrUpdatePermissionData.id ? '更新成功' : '添加成功',
+      message: res.message,
     });
     getHasPermission();
+  } else {
+    ElMessage({
+      type: 'error',
+      message: res.message,
+    });
   }
 };
 
 // 删除权限
 const removeMenu = async (id: number) => {
   let res: DeletePermissionResponseData = await reqRemoveMenu(id);
-  if (res.code === 20332) {
-    ElMessage({ type: 'success', message: '删除成功' });
+  if (res.code === ResultCode.PERMISSION_DELETED_SUCCESS) {
+    ElMessage({ type: 'success', message: res.message });
     getHasPermission();
+  } else {
+    ElMessage({ type: 'error', message: res.message });
   }
 };
 

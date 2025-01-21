@@ -10,13 +10,13 @@ import type {
 } from './type';
 
 const API = {
-  ALLUSER_URL: '/user/',
-  ADDUSER_URL: '/user',
-  UPDATEUSER_URL: '/user/',
+  ALLUSER_URL: '/user/all/',
+  ADDUSER_URL: '/user/add',
+  UPDATEUSER_URL: '/user/update/',
   ALLROLEURL: '/user/getAssignRole/',
   SETROLE_url: '/user/assignRole/',
-  DELETEUSER_URL: '/user/',
-  DELETEALLUSER_URL: '/user',
+  DELETEUSER_URL: '/user/delete/one/',
+  DELETEALLUSER_URL: '/user/delete/batch',
 };
 
 // 分页获取用户✅
