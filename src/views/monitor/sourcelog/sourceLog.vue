@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="app-container" v-loading="loading">
     <el-row gutter="20">
       <!-- CPU 资源统计 -->
       <el-col :span="12" class="card-box">
@@ -296,18 +296,27 @@ import { reqSourcelogInfo } from '../../../api/monitor/sourcelog/index';
 import { ElMessage } from 'element-plus';
 import { ResultCode } from '../../../api/constant';
 const server = ref({});
+const loading = ref(false);
 
 onMounted(() => {
   getSourcelogInfo();
 });
 
 const getSourcelogInfo = async () => {
-  // 获取服务器信息
-  const res = await reqSourcelogInfo();
-  if (res.code === ResultCode.GET_HARDWARE_SUCCESS) {
-    server.value = res.data;
-  } else {
-    ElMessage.error(res.message);
+  try {
+    // 获取服务器信息
+    loading.value = true; // 隐藏 loading
+    const res = await reqSourcelogInfo();
+    if (res.code === ResultCode.GET_HARDWARE_SUCCESS) {
+      server.value = res.data;
+    } else {
+      ElMessage.error(res.message);
+    }
+  } catch (error) {
+    console.error('Error fetching server info:', error);
+    ElMessage.error('获取服务器信息失败');
+  } finally {
+    loading.value = false; // 隐藏 loading
   }
 };
 </script>

@@ -12,7 +12,7 @@ enum API {
   USERINFO_URL = '/auth/info',
   LOGOUT_URL = '/auth/logout',
 }
-//登录接口✅
+// 登录接口✅
 export const reqLogin = (data: LoginFormData): Promise<LoginResponseData> => {
   return request.post(API.LOGIN_URL, data);
 };
