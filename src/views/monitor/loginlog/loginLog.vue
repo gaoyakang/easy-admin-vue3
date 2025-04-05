@@ -6,7 +6,6 @@
         :model="queryParams.keyword"
         ref="queryRef"
         :inline="true"
-        v-show="showSearch"
         label-width="68px"
       >
         <el-form-item label="登录地址" prop="ipaddr">
@@ -70,10 +69,6 @@
             导出
           </el-button>
         </el-col>
-        <right-toolbar
-          v-model:showSearch="showSearch"
-          @queryTable="getList"
-        ></right-toolbar>
       </el-row>
       <!-- 表格 -->
       <el-table
@@ -81,7 +76,6 @@
         v-loading="loading"
         :data="logininfoList"
         @selection-change="handleSelectionChange"
-        :default-sort="defaultSort"
         @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="55" align="center" />
@@ -164,7 +158,6 @@ import { ElMessage } from 'element-plus';
 import { reqAllLoginLog } from '../../../api/monitor/loginlog/index';
 // 表头ref
 const queryRef = ref();
-const showSearch = ref(true);
 const loading = ref(false);
 let total = ref(10); // 总用户数
 
@@ -304,9 +297,9 @@ const getHasLoginLog = async (pager = 1) => {
       queryParams.value.pageNum,
       queryParams.value.pageSize,
       {
-        ipaddr: queryParams.value.ipaddr,
-        userName: queryParams.value.userName,
-        status: queryParams.value.status,
+        ipaddr: queryParams.value.keyword.ipaddr,
+        userName: queryParams.value.keyword.userName,
+        status: queryParams.value.keyword.status,
       },
     );
     if (res.code === ResultCode.LOGINLOG_FINDALL_SUCCESS) {
@@ -335,6 +328,7 @@ const pageChangehandler = () => {
 
 const handleQuery = () => {
   // 搜索
+  getHasLoginLog();
 };
 
 const resetQuery = () => {

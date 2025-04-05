@@ -1,6 +1,6 @@
 <template>
   <div class="app-container" v-loading="loading">
-    <el-row gutter="20">
+    <el-row>
       <!-- CPU 资源统计 -->
       <el-col :span="12" class="card-box">
         <el-card>
