@@ -42,9 +42,12 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" icon="Search" @click="handleQuery">
+          <BtnAuthCheck
+            :click="handleQuery"
+            :permission="['btn.Loginlog.queryAll']"
+          >
             搜索
-          </el-button>
+          </BtnAuthCheck>
           <el-button icon="Refresh" @click="resetQuery">重置</el-button>
         </el-form-item>
       </el-form>
@@ -55,15 +58,14 @@
       <!-- 删除 -->
       <el-row :gutter="10" class="mb8">
         <el-col :span="1.5">
-          <el-button
+          <BtnAuthCheck
             type="danger"
-            plain
-            icon="Delete"
+            :click="handleDelete"
+            :permission="['btn.Loginlog.batchDelete']"
             :disabled="batchDel.length === 0"
-            @click="handleDelete"
           >
             批量删除
-          </el-button>
+          </BtnAuthCheck>
         </el-col>
       </el-row>
       <!-- 表格 -->
@@ -157,6 +159,8 @@ import { ResultCode } from '../../../api/constant';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { reqAllLoginLog } from '../../../api/monitor/loginlog/index';
 import { reqRemoveLoginLogs } from '../../../api/monitor/loginlog/index';
+import BtnAuthCheck from '../../../components/auth/BtnAuthCheck.vue';
+
 // 表头ref
 const queryRef = ref();
 const loading = ref(false);
@@ -338,9 +342,7 @@ const handleQuery = () => {
 
 // 重置搜索
 const resetQuery = () => {
-  queryParams.value.ipaddr = '';
-  queryParams.value.userName = '';
-  queryParams.value.status = '';
+  queryRef.value.resetFields();
   queryParams.value.pageNum = 1;
   getHasLoginLog();
 };

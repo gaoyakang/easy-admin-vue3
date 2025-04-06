@@ -188,6 +188,16 @@ export const asyncRoute: RouteType[] = [
           icon: 'ChatDotRound',
         },
       },
+      {
+        path: '/service/schedule',
+        component: () => import('../views/service/schedule/scheduleManage.vue'),
+        name: 'Schedule',
+        meta: {
+          title: '定时管理',
+          hidden: false,
+          icon: 'Timer',
+        },
+      },
     ],
   },
   {
