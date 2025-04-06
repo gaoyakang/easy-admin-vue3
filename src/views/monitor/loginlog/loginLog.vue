@@ -52,7 +52,7 @@
 
     <!-- 表格 -->
     <el-card style="margin: 10px 0">
-      <!-- 删除/清空/导出 -->
+      <!-- 删除 -->
       <el-row :gutter="10" class="mb8">
         <el-col :span="1.5">
           <el-button
@@ -62,17 +62,7 @@
             :disabled="batchDel.length === 0"
             @click="handleDelete"
           >
-            删除
-          </el-button>
-        </el-col>
-        <el-col :span="1.5">
-          <el-button type="danger" plain icon="Delete" @click="handleClean">
-            清空
-          </el-button>
-        </el-col>
-        <el-col :span="1.5">
-          <el-button type="warning" plain icon="Download" @click="handleExport">
-            导出
+            批量删除
           </el-button>
         </el-col>
       </el-row>
@@ -82,7 +72,6 @@
         v-loading="loading"
         :data="logininfoList"
         @selection-change="handleSelectionChange"
-        @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column
@@ -337,12 +326,13 @@ const getHasLoginLog = async (pager = 1) => {
   }
 };
 
+// 分页变化
 const pageChangehandler = () => {
-  // 分页变化
+  getHasLoginLog();
 };
 
+// 搜索
 const handleQuery = () => {
-  // 搜索
   getHasLoginLog();
 };
 
@@ -369,9 +359,8 @@ const handleDelete = () => {
   })
     .then(async () => {
       try {
-        console.log('batchDel', batchDel.value);
         const res = await reqRemoveLoginLogs(batchDel.value);
-        if (res.code === 200) {
+        if (res.code === ResultCode.LOGINLOGS_BATCH_DELETE_SUCCESS) {
           ElMessage({
             type: 'success',
             message: res.message,
@@ -397,18 +386,6 @@ const handleDelete = () => {
         message: '已取消删除',
       });
     });
-};
-
-const handleClean = () => {
-  // 实现清空逻辑
-};
-
-const handleExport = () => {
-  // 实现导出逻辑
-};
-
-const handleSortChange = () => {
-  // 实现排序逻辑
 };
 </script>
 
