@@ -55,7 +55,13 @@
       <!-- 删除/清空/导出 -->
       <el-row :gutter="10" class="mb8">
         <el-col :span="1.5">
-          <el-button type="danger" plain icon="Delete" @click="handleDelete">
+          <el-button
+            type="danger"
+            plain
+            icon="Delete"
+            :disabled="batchDel.length === 0"
+            @click="handleDelete"
+          >
             删除
           </el-button>
         </el-col>
@@ -79,6 +85,11 @@
         @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="55" align="center" />
+        <el-table-column
+          label="记录id"
+          align="center"
+          prop="id"
+        ></el-table-column>
         <el-table-column
           label="用户账号"
           align="center"
@@ -154,8 +165,9 @@
 import { ref, onMounted } from 'vue';
 import DictTag from '../../../components/dictTag/DictTag.vue';
 import { ResultCode } from '../../../api/constant';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { reqAllLoginLog } from '../../../api/monitor/loginlog/index';
+import { reqRemoveLoginLogs } from '../../../api/monitor/loginlog/index';
 // 表头ref
 const queryRef = ref();
 const loading = ref(false);
@@ -283,6 +295,9 @@ const logininfoList = ref([
   // },
 ]);
 
+// 存储选中的登录日志ID
+const batchDel = ref([]);
+
 // 页面初始化
 onMounted(() => {
   getHasLoginLog();
@@ -331,8 +346,8 @@ const handleQuery = () => {
   getHasLoginLog();
 };
 
+// 重置搜索
 const resetQuery = () => {
-  // 重置搜索
   queryParams.value.ipaddr = '';
   queryParams.value.userName = '';
   queryParams.value.status = '';
@@ -340,8 +355,48 @@ const resetQuery = () => {
   getHasLoginLog();
 };
 
+// 实现选中逻辑
+const handleSelectionChange = (val) => {
+  batchDel.value = val.map((item) => item.id);
+};
+
+// 实现批量删除逻辑
 const handleDelete = () => {
-  // 实现删除逻辑
+  ElMessageBox.confirm('此操作将永久删除选中的登录日志, 是否继续?', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+    .then(async () => {
+      try {
+        console.log('batchDel', batchDel.value);
+        const res = await reqRemoveLoginLogs(batchDel.value);
+        if (res.code === 200) {
+          ElMessage({
+            type: 'success',
+            message: res.message,
+          });
+          // 刷新数据
+          getHasLoginLog();
+        } else {
+          ElMessage({
+            type: 'error',
+            message: res.message,
+          });
+        }
+      } catch (error) {
+        ElMessage({
+          type: 'error',
+          message: error.message,
+        });
+      }
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'error',
+        message: '已取消删除',
+      });
+    });
 };
 
 const handleClean = () => {
@@ -350,10 +405,6 @@ const handleClean = () => {
 
 const handleExport = () => {
   // 实现导出逻辑
-};
-
-const handleSelectionChange = () => {
-  // 实现选中逻辑
 };
 
 const handleSortChange = () => {

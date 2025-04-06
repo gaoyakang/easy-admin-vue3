@@ -24,3 +24,8 @@ export interface LoginlogQueryAllResponseData extends ResponseData {
     total: number;
   };
 }
+
+// 批量删除登陆日志返回结果类型
+export interface DeleteLoginLogsResponseData extends ResponseData {
+  data: [];
+}

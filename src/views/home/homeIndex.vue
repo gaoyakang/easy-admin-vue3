@@ -13,7 +13,6 @@
         <div class="buttons">
           <el-button
             type="primary"
-            size="mini"
             icon="MostlyCloudy"
             plain
             @click="goTarget('https://github.com/gaoyakang/easy-admin-vue3')"
@@ -21,7 +20,6 @@
             访问github
           </el-button>
           <el-button
-            size="mini"
             icon="HomeFilled"
             plain
             @click="goTarget('http://localhost:3000/api/')"
